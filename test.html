@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Privacy-First Analytics Dashboard</title>
+        <style>
+            body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+            .card { background: #2a2a2a; padding: 20px; margin: 10px 0; border-radius: 8px; }
+            .guarantee { background: #2a4a2a; border: 2px solid #4CAF50; }
+        </style>
+    </head>
+    <body>
+        <h1>🛡️ Privacy-First Mental Health Analytics</h1>
+        
+        <div class="card guarantee">
+            <h3>Privacy Guarantee</h3>
+            <p><strong>{{ data.get('privacy_guarantee', 'Privacy service unavailable') }}</strong></p>
+        </div>
+        
+        {% if 'error' not in data %}
+        <div class="card">
+            <h3>Processing Statistics</h3>
+            <p>Messages Processed: {{ data.total_messages_processed }}</p>
+            <p>Crisis Interventions: {{ data.crisis_interventions_triggered }}</p>
+        </div>
+        
+        <div class="card">
+            <h3>Anonymous Emotional Trends</h3>
+            {% for emotion in data.top_emotions_today %}
+            <p>{{ emotion.emotion.title() }}: {{ emotion.percentage }}%</p>
+            {% endfor %}
+        </div>
+        
+        <div class="card">
+            <h3>Common Anonymous Themes</h3>
+            {% for theme in data.common_themes %}
+            <p>• {{ theme }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </body>
+    </html>
