@@ -13,10 +13,10 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-type NavSection = 'all' | 'videos' | 'podcasts' | 'articles' | 'live';
-type SubmitType = 'video' | 'podcast' | 'article';
+type NavSection = 'all' | 'milestones' | 'podcasts' | 'articles' | 'rehabilitation';
+type SubmitType = 'article' | 'podcast' | 'milestone';
 
-interface VideoStory {
+interface JusticeStory {
   id: number;
   author: string;
   initials: string;
@@ -29,8 +29,7 @@ interface VideoStory {
   helpful: string;
   comments: number;
   duration: string;
-  isLive?: boolean;
-  watching?: number;
+  compensationStatus: string;
 }
 
 interface PodcastEpisode {
@@ -43,7 +42,6 @@ interface PodcastEpisode {
   progress: number;
   accentColor: string;
   isNew?: boolean;
-  isCompleted?: boolean;
 }
 
 interface Article {
@@ -62,138 +60,153 @@ interface Article {
   claps: number;
 }
 
-interface CountryStat {
+interface StateImpactStat {
+  state: string;
+  casesSupported: number;
+  reliefDisbursed: string;
   flag: string;
-  name: string;
-  count: number;
 }
 
-const videoStories: VideoStory[] = [
+const justiceStories: JusticeStory[] = [
   {
     id: 1,
-    author: 'Sofia L.',
-    initials: 'SL',
+    author: 'Suresh Meshram',
+    initials: 'SM',
     avatarColor: '#5AC8FA',
-    location: 'Amsterdam, Netherlands',
-    tag: 'ANXIETY · RECOVERY',
-    tagColor: '#5856D6',
-    title: 'How I stopped panic attacks from ruling my life — 3 years later',
-    views: '1.2k',
-    helpful: '94%',
-    comments: 47,
-    duration: '24:18',
-    isLive: true,
-    watching: 38,
+    location: 'Wardha, Maharashtra',
+    tag: 'SPECIAL COURT CONVICTION',
+    tagColor: '#30D158',
+    title: 'Winning our 2-year SC/ST Special Court trial and securing full Rule-12 economic rehabilitation',
+    views: '4.8k',
+    helpful: '99%',
+    comments: 84,
+    duration: '22:15',
+    compensationStatus: '₹8,25,000 Disbursed',
   },
   {
     id: 2,
-    author: 'Yuki T.',
-    initials: 'YT',
+    author: 'Pooja Rathod & Family',
+    initials: 'PR',
     avatarColor: '#30D158',
-    location: 'Seoul, South Korea',
-    tag: 'BURNOUT',
+    location: 'Gulbarga, Karnataka',
+    tag: 'WITNESS PROTECTION SUCCESS',
     tagColor: '#FF9500',
-    title: 'Quitting a corporate job that was destroying my mental health',
-    views: '3.4k',
+    title: 'How 24/7 armed police escort under Section 15A protected our family until testimony concluded',
+    views: '3.2k',
     helpful: '97%',
+    comments: 56,
+    duration: '18:40',
+    compensationStatus: 'Full Protection Executed',
+  },
+  {
+    id: 3,
+    author: 'Babulal Meghwal',
+    initials: 'BM',
+    avatarColor: '#FF6B6B',
+    location: 'Alwar, Rajasthan',
+    tag: 'ANTI-BOYCOTT VICTORY',
+    tagColor: '#5856D6',
+    title: 'Defeating a village social boycott with District Nodal Officer intervention and restoring water access',
+    views: '5.1k',
+    helpful: '98%',
     comments: 112,
-    duration: '31:44',
+    duration: '26:50',
+    compensationStatus: 'Community Dignity Restored',
   },
 ];
 
 const podcastEpisodes: PodcastEpisode[] = [
   {
     id: 1,
-    title: 'From rock bottom to running marathons',
-    author: 'Marcus T.',
-    location: 'Lagos, Nigeria',
-    episode: 12,
-    duration: '28:14',
-    progress: 62,
+    title: 'Empowered by Law: Demystifying Special Court Cross-Examinations',
+    author: 'Adv. Sanjay Kamble (DLSA)',
+    location: 'Pune Special Court',
+    episode: 14,
+    duration: '24:10',
+    progress: 75,
     accentColor: '#5856D6',
   },
   {
     id: 2,
-    title: 'Learning to trust again after trauma',
-    author: 'Priya K.',
-    location: 'Mumbai, India',
-    episode: 7,
-    duration: '41:02',
+    title: 'From Intimidation to Courage: A Witness Story',
+    author: 'Anita Valmiki',
+    location: 'Indore, MP',
+    episode: 9,
+    duration: '31:00',
     progress: 0,
     accentColor: '#30D158',
     isNew: true,
   },
   {
     id: 3,
-    title: 'Beating depression without medication',
-    author: 'James W.',
-    location: 'Toronto, Canada',
-    episode: 4,
-    duration: '19:38',
+    title: 'Claiming Your Statutory Welfare: Step-by-Step Guide to Rule 12',
+    author: 'Rameshwar T. (Rehab Officer)',
+    location: 'Nagpur',
+    episode: 6,
+    duration: '19:45',
     progress: 100,
     accentColor: '#FF9500',
-    isCompleted: true,
   },
 ];
 
 const articles: Article[] = [
   {
     id: 1,
-    author: 'Aiko O.',
-    initials: 'AO',
+    author: 'Kavita D.',
+    initials: 'KD',
     avatarColor: '#5AC8FA',
     avatarBg: '#1a1a2e',
-    location: 'Tokyo, Japan',
-    tag: 'DEPRESSION',
-    tagColor: '#5856D6',
-    iconBg: '#1a1a2e',
-    title: 'The 5 things that actually helped me get out of bed every morning',
+    location: 'Kolhapur, Maharashtra',
+    tag: 'REHABILITATION',
+    tagColor: '#30D158',
+    iconBg: '#1a2e1a',
+    title: 'How our self-help group rebuilt our livelihood after land dispossession',
     preview:
-      'I spent 18 months barely leaving my apartment. Here is what finally worked — not what I expected...',
+      'With the government rehabilitation grant and psychological grounding from Elevana AI, we established a collective agricultural enterprise...',
     readTime: '6 min read',
-    claps: 312,
+    claps: 642,
   },
   {
     id: 2,
-    author: 'Remi B.',
-    initials: 'RB',
+    author: 'Dr. Mohan Sonawane',
+    initials: 'MS',
     avatarColor: '#30D158',
     avatarBg: '#1a2e1a',
-    location: 'Nairobi, Kenya',
-    tag: 'GRIEF',
-    tagColor: '#30D158',
-    iconBg: '#1a2e1a',
-    title: 'Losing my mother and finding myself — a year of healing in letters',
+    location: 'Aurangabad',
+    tag: 'TRAUMA OVERCOMING',
+    tagColor: '#5856D6',
+    iconBg: '#1a1a2e',
+    title: 'Overcoming trial-induced insomnia: 5 cognitive strategies that saved my health',
     preview:
-      'Writing unsent letters to her changed something in me I cannot fully explain. Maybe it will help you too...',
-    readTime: '9 min read',
-    claps: 541,
+      'Preparing for court dates triggered severe panic. Here is how EMDR and bilateral breathwork restored my sleep and focus...',
+    readTime: '8 min read',
+    claps: 891,
   },
   {
     id: 3,
-    author: 'Carlos M.',
-    initials: 'CM',
+    author: 'Sunita & Deepak',
+    initials: 'SD',
     avatarColor: '#FF6B6B',
     avatarBg: '#2e1a1a',
-    location: 'São Paulo, Brazil',
-    tag: 'PTSD',
+    location: 'Belagavi, Karnataka',
+    tag: 'LEGAL ADVOCACY',
     tagColor: '#FF6B6B',
     iconBg: '#2e1a1a',
-    title: 'Two years of EMDR therapy — an honest review from a skeptic',
+    title: 'Why you should never hesitate to demand DSP-level investigation under Rule 7',
     preview:
-      'I went in rolling my eyes. I came out crying — in the best way. This is my unfiltered experience...',
-    readTime: '11 min read',
-    claps: 887,
+      'When our initial complaint was delayed, citing Rule 7 of the PoA rules changed everything. Here is the exact procedure...',
+    readTime: '7 min read',
+    claps: 1204,
   },
 ];
 
-const countryStats: CountryStat[] = [
-  { flag: '🇺🇸', name: 'United States', count: 412 },
-  { flag: '🇮🇳', name: 'India', count: 289 },
-  { flag: '🇬🇧', name: 'UK', count: 174 },
-  { flag: '🇧🇷', name: 'Brazil', count: 138 },
-  { flag: '🇳🇬', name: 'Nigeria', count: 96 },
-  { flag: '🇦🇺', name: 'Australia', count: 81 },
+const stateStats: StateImpactStat[] = [
+  { flag: '🇮🇳', state: 'Maharashtra', casesSupported: 1420, reliefDisbursed: '₹6.2 Cr' },
+  { flag: '🇮🇳', state: 'Karnataka', casesSupported: 980, reliefDisbursed: '₹4.1 Cr' },
+  { flag: '🇮🇳', state: 'Rajasthan', casesSupported: 840, reliefDisbursed: '₹3.8 Cr' },
+  { flag: '🇮🇳', state: 'Madhya Pradesh', casesSupported: 790, reliefDisbursed: '₹3.1 Cr' },
+  { flag: '🇮🇳', state: 'Tamil Nadu', casesSupported: 510, reliefDisbursed: '₹2.4 Cr' },
+  { flag: '🇮🇳', state: 'Uttar Pradesh', casesSupported: 680, reliefDisbursed: '₹2.9 Cr' },
 ];
 
 const SuccessNetwork: React.FC = () => {
@@ -203,6 +216,7 @@ const SuccessNetwork: React.FC = () => {
   const [submitType, setSubmitType] = useState<SubmitType>('article');
   const [storyTitle, setStoryTitle] = useState('');
   const [storyContent, setStoryContent] = useState('');
+  const [storyDistrict, setStoryDistrict] = useState('');
   const [clapCounts, setClapCounts] = useState<{ [id: number]: number }>({});
 
   const handleClap = (articleId: number, baseClaps: number) => {
@@ -213,26 +227,26 @@ const SuccessNetwork: React.FC = () => {
   };
 
   const handleSubmitStory = () => {
-    if (!storyTitle.trim() || !storyContent.trim()) return;
+    if (!storyTitle.trim() || !storyContent.trim()) {
+      Alert.alert('Incomplete', 'Please provide a title and story description.');
+      return;
+    }
     Alert.alert(
-      'Story submitted!',
-      'Thank you for sharing your journey. Our team will review your story and publish it shortly.',
+      '🌟 Victory Journey Submitted!',
+      'Thank you for inspiring fellow survivors. Your story has been queued for anonymization and publication.',
       [{ text: 'OK', onPress: () => setShowShareModal(false) }]
     );
     setStoryTitle('');
     setStoryContent('');
+    setStoryDistrict('');
   };
-
-  const showVideos = activeSection === 'all' || activeSection === 'videos' || activeSection === 'live';
-  const showPodcasts = activeSection === 'all' || activeSection === 'podcasts';
-  const showArticles = activeSection === 'all' || activeSection === 'articles';
 
   const navItems: { key: NavSection; label: string }[] = [
     { key: 'all', label: 'All' },
-    { key: 'videos', label: 'Videos' },
-    { key: 'podcasts', label: 'Podcasts' },
-    { key: 'articles', label: 'Articles' },
-    { key: 'live', label: '● Live Now' },
+    { key: 'milestones', label: '🏛️ Victories' },
+    { key: 'podcasts', label: '🎙️ Podcasts' },
+    { key: 'articles', label: '📝 Articles' },
+    { key: 'rehabilitation', label: '🌱 Rehab' },
   ];
 
   return (
@@ -244,12 +258,27 @@ const SuccessNetwork: React.FC = () => {
         </TouchableOpacity>
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerTitle}>Success Network</Text>
-          <Text style={styles.headerSubtitle}>
-            <Text style={styles.onlineDot}>● </Text>
-            2,841 members sharing their journey
-          </Text>
+          <Text style={styles.headerSubtitle}>Justice Milestones & Survivor Victories</Text>
         </View>
         <View style={styles.placeholder} />
+      </View>
+
+      {/* Impact Numbers Banner */}
+      <View style={styles.impactBanner}>
+        <View style={styles.impactCol}>
+          <Text style={styles.impactNum}>4,820+</Text>
+          <Text style={styles.impactLabel}>Victims Monitored</Text>
+        </View>
+        <View style={styles.impactDivider} />
+        <View style={styles.impactCol}>
+          <Text style={styles.impactNum}>₹18.6 Cr</Text>
+          <Text style={styles.impactLabel}>Relief Fast-Tracked</Text>
+        </View>
+        <View style={styles.impactDivider} />
+        <View style={styles.impactCol}>
+          <Text style={styles.impactNum}>94%</Text>
+          <Text style={styles.impactLabel}>Trial Distress Relief</Text>
+        </View>
       </View>
 
       {/* Nav */}
@@ -273,65 +302,58 @@ const SuccessNetwork: React.FC = () => {
       </ScrollView>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Videos / Featured */}
-        {showVideos && (
+        {/* Featured Court & Justice Victories */}
+        {(activeSection === 'all' || activeSection === 'milestones') && (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>
-              {activeSection === 'live' ? 'Live Now' : 'Featured stories'}
-            </Text>
-            {videoStories
-              .filter((v) => activeSection !== 'live' || v.isLive)
-              .map((video) => (
-                <TouchableOpacity key={video.id} style={styles.videoCard}>
-                  <View style={styles.videoThumb}>
-                    {video.isLive && (
-                      <View style={styles.liveBadge}>
-                        <Text style={styles.liveBadgeText}>● LIVE</Text>
-                      </View>
-                    )}
-                    <View style={styles.playCircle}>
-                      <Text style={styles.playIcon}>▶</Text>
-                    </View>
-                    <View style={styles.durationBadge}>
-                      <Text style={styles.durationText}>
-                        {video.isLive ? `${video.watching} watching` : video.duration}
-                      </Text>
-                    </View>
+            <Text style={styles.sectionLabel}>Landmark Justice Milestones</Text>
+            {justiceStories.map((story) => (
+              <View key={story.id} style={styles.storyCard}>
+                <View style={styles.storyThumb}>
+                  <View style={styles.compBadge}>
+                    <Text style={styles.compBadgeText}>⚖️ {story.compensationStatus}</Text>
                   </View>
-                  <View style={styles.videoBody}>
-                    <Text style={[styles.videoTag, { color: video.tagColor }]}>{video.tag}</Text>
-                    <Text style={styles.videoTitle}>{video.title}</Text>
-                    <View style={styles.videoMeta}>
-                      <View style={[styles.avatar, { backgroundColor: '#1a1a2e' }]}>
-                        <Text style={[styles.avatarText, { color: video.avatarColor }]}>
-                          {video.initials}
-                        </Text>
-                      </View>
-                      <Text style={styles.videoAuthor}>
-                        {video.author} · {video.location}
-                      </Text>
-                    </View>
-                    <View style={styles.videoStats}>
-                      <Text style={styles.videoStat}>
-                        <Text style={styles.videoStatValue}>{video.views}</Text> views
-                      </Text>
-                      <Text style={styles.videoStat}>
-                        <Text style={styles.videoStatValue}>{video.helpful}</Text> helpful
-                      </Text>
-                      <Text style={styles.videoStat}>
-                        <Text style={styles.videoStatValue}>{video.comments}</Text> comments
-                      </Text>
-                    </View>
+                  <View style={styles.playCircle}>
+                    <Text style={styles.playIcon}>▶</Text>
                   </View>
-                </TouchableOpacity>
-              ))}
+                  <View style={styles.durationBadge}>
+                    <Text style={styles.durationText}>{story.duration}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.storyBody}>
+                  <Text style={[styles.storyTag, { color: story.tagColor }]}>{story.tag}</Text>
+                  <Text style={styles.storyTitle}>{story.title}</Text>
+                  <View style={styles.storyMeta}>
+                    <View style={[styles.avatar, { backgroundColor: '#1a1a2e' }]}>
+                      <Text style={[styles.avatarText, { color: story.avatarColor }]}>
+                        {story.initials}
+                      </Text>
+                    </View>
+                    <Text style={styles.storyAuthor}>
+                      {story.author} · {story.location}
+                    </Text>
+                  </View>
+                  <View style={styles.storyStats}>
+                    <Text style={styles.storyStat}>
+                      <Text style={styles.statValue}>{story.views}</Text> listens
+                    </Text>
+                    <Text style={styles.storyStat}>
+                      <Text style={styles.statValue}>{story.helpful}</Text> found inspiring
+                    </Text>
+                    <Text style={styles.storyStat}>
+                      <Text style={styles.statValue}>{story.comments}</Text> reflections
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            ))}
           </View>
         )}
 
         {/* Podcasts */}
-        {showPodcasts && (
+        {(activeSection === 'all' || activeSection === 'podcasts') && (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Podcast episodes</Text>
+            <Text style={styles.sectionLabel}>Empowerment Podcasts & Legal Dialogues</Text>
             {podcastEpisodes.map((ep) => (
               <TouchableOpacity key={ep.id} style={styles.podcastCard}>
                 <View style={[styles.podIcon, { backgroundColor: ep.accentColor + '22' }]}>
@@ -352,7 +374,7 @@ const SuccessNetwork: React.FC = () => {
                   </View>
                   <Text style={styles.podTime}>
                     {ep.duration}
-                    {ep.isNew ? ' · New' : ep.isCompleted ? ' · Completed' : ` · ${ep.progress}% complete`}
+                    {ep.isNew ? ' · New Release' : ` · ${ep.progress}% Completed`}
                   </Text>
                 </View>
                 <View style={[styles.podPlayBtn, { backgroundColor: ep.accentColor }]}>
@@ -363,10 +385,10 @@ const SuccessNetwork: React.FC = () => {
           </View>
         )}
 
-        {/* Articles */}
-        {showArticles && (
+        {/* Articles & Personal Essays */}
+        {(activeSection === 'all' || activeSection === 'articles' || activeSection === 'rehabilitation') && (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>User articles</Text>
+            <Text style={styles.sectionLabel}>Survivor Guides & Recovery Articles</Text>
             {articles.map((article) => (
               <View key={article.id} style={styles.articleCard}>
                 <View style={styles.articleTop}>
@@ -404,25 +426,25 @@ const SuccessNetwork: React.FC = () => {
           </View>
         )}
 
-        {/* Global Stats */}
-        {(activeSection === 'all') && (
+        {/* State Impact Map & Stats */}
+        {activeSection === 'all' && (
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Stories from around the world</Text>
+            <Text style={styles.sectionLabel}>State-Wise Protection & Relief Impact</Text>
             <View style={styles.globalCard}>
               <View style={styles.globeRow}>
                 <View style={styles.globeIcon}>
-                  <Text style={styles.globeEmoji}>🌍</Text>
+                  <Text style={styles.globeEmoji}>🏛️</Text>
                 </View>
                 <View>
-                  <Text style={styles.globeTitle}>Global voices</Text>
-                  <Text style={styles.globeSub}>Stories from 74 countries this month</Text>
+                  <Text style={styles.globeTitle}>National Special Cell Integration</Text>
+                  <Text style={styles.globeSub}>Elevana AI active across 18 State Welfare Depts</Text>
                 </View>
               </View>
-              <View style={styles.countryChips}>
-                {countryStats.map((c) => (
-                  <View key={c.name} style={styles.countryChip}>
-                    <Text style={styles.chipFlag}>{c.flag}</Text>
-                    <Text style={styles.chipText}>{c.name} · {c.count}</Text>
+              <View style={styles.stateChips}>
+                {stateStats.map((s) => (
+                  <View key={s.state} style={styles.stateChip}>
+                    <Text style={styles.stateFlag}>{s.flag}</Text>
+                    <Text style={styles.stateText}>{s.state} · {s.casesSupported} cases ({s.reliefDisbursed})</Text>
                   </View>
                 ))}
               </View>
@@ -433,9 +455,9 @@ const SuccessNetwork: React.FC = () => {
         {/* Share CTA */}
         <View style={styles.section}>
           <TouchableOpacity style={styles.shareBtn} onPress={() => setShowShareModal(true)}>
-            <Text style={styles.shareBtnText}>+ Share Your Story</Text>
+            <Text style={styles.shareBtnText}>+ Share Your Justice or Recovery Journey</Text>
           </TouchableOpacity>
-          <Text style={styles.shareSub}>Your journey could be the hope someone needs today</Text>
+          <Text style={styles.shareSub}>Your courage breaks the silence and guides fellow survivors to justice</Text>
         </View>
 
         <View style={{ height: 40 }} />
@@ -451,72 +473,58 @@ const SuccessNetwork: React.FC = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Share Your Story</Text>
-              <TouchableOpacity
-                style={styles.modalClose}
-                onPress={() => setShowShareModal(false)}
-              >
+              <Text style={styles.modalTitle}>Share Your Journey to Justice</Text>
+              <TouchableOpacity onPress={() => setShowShareModal(false)}>
                 <Text style={styles.modalCloseText}>✕</Text>
               </TouchableOpacity>
             </View>
 
             <Text style={styles.modalSub}>
-              Choose how you'd like to share your recovery journey
+              Share how legal aid, police protection, or counseling helped you overcome adversity.
             </Text>
 
             <View style={styles.typeRow}>
-              {(['article', 'podcast', 'video'] as SubmitType[]).map((t) => (
+              {(['article', 'milestone', 'podcast'] as SubmitType[]).map((t) => (
                 <TouchableOpacity
                   key={t}
                   style={[styles.typePill, submitType === t && styles.activeTypePill]}
                   onPress={() => setSubmitType(t)}
                 >
                   <Text style={[styles.typePillText, submitType === t && styles.activeTypePillText]}>
-                    {t === 'article' ? '📝 Article' : t === 'podcast' ? '🎙️ Podcast' : '🎬 Video'}
+                    {t === 'article' ? '📝 Article' : t === 'milestone' ? '🏛️ Court Victory' : '🎙️ Audio'}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <Text style={styles.inputLabel}>Title</Text>
+            <Text style={styles.inputLabel}>Story Title *</Text>
             <TextInput
               style={styles.textInput}
-              placeholder={
-                submitType === 'article'
-                  ? 'e.g. How I overcame social anxiety...'
-                  : submitType === 'podcast'
-                  ? 'e.g. My journey through depression'
-                  : 'e.g. Life after addiction — 2 years free'
-              }
+              placeholder="e.g., How we secured witness protection & won our trial"
               placeholderTextColor="#8E8E93"
               value={storyTitle}
               onChangeText={setStoryTitle}
             />
 
-            <Text style={styles.inputLabel}>
-              {submitType === 'article' ? 'Your story' : submitType === 'podcast' ? 'Episode description' : 'Video description'}
-            </Text>
+            <Text style={styles.inputLabel}>District / State (Optional)</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="e.g., Wardha, Maharashtra"
+              placeholderTextColor="#8E8E93"
+              value={storyDistrict}
+              onChangeText={setStoryDistrict}
+            />
+
+            <Text style={styles.inputLabel}>Your Experience & Insights *</Text>
             <TextInput
               style={[styles.textInput, styles.textArea]}
-              placeholder="Share the details of your journey — what happened, what helped, and what you'd tell others going through the same..."
+              placeholder="Detail your legal or recovery steps, what advice you would give other victims..."
               placeholderTextColor="#8E8E93"
               value={storyContent}
               onChangeText={setStoryContent}
               multiline
               textAlignVertical="top"
             />
-
-            {submitType !== 'article' && (
-              <View style={styles.uploadArea}>
-                <Text style={styles.uploadIcon}>
-                  {submitType === 'podcast' ? '🎙️' : '🎬'}
-                </Text>
-                <Text style={styles.uploadText}>
-                  Tap to upload your {submitType} file
-                </Text>
-                <Text style={styles.uploadSub}>MP3, MP4 · Max 500MB</Text>
-              </View>
-            )}
 
             <TouchableOpacity
               style={[
@@ -526,7 +534,7 @@ const SuccessNetwork: React.FC = () => {
               onPress={handleSubmitStory}
               disabled={!storyTitle.trim() || !storyContent.trim()}
             >
-              <Text style={styles.submitBtnText}>Submit for Review</Text>
+              <Text style={styles.submitBtnText}>Submit Anonymously for Publication</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -537,15 +545,13 @@ const SuccessNetwork: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000000' },
-
-  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 14,
     backgroundColor: '#1C1C1E',
-    borderBottomWidth: 0.5,
+    borderBottomWidth: 1,
     borderBottomColor: '#38383A',
   },
   backButton: {
@@ -560,67 +566,94 @@ const styles = StyleSheet.create({
   headerTextContainer: { flex: 1, alignItems: 'center' },
   headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#FFFFFF' },
   headerSubtitle: { fontSize: 11, color: '#8E8E93', marginTop: 2 },
-  onlineDot: { color: '#30D158' },
   placeholder: { width: 40 },
-
-  // Nav
+  impactBanner: {
+    flexDirection: 'row',
+    backgroundColor: '#1A241A',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#285E28',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  impactCol: { alignItems: 'center' },
+  impactNum: { fontSize: 15, fontWeight: 'bold', color: '#30D158' },
+  impactLabel: { fontSize: 10, color: '#A8E6CF', marginTop: 1 },
+  impactDivider: { width: 1, height: 24, backgroundColor: '#285E28' },
   navContainer: {
     backgroundColor: '#1C1C1E',
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#38383A',
+    borderBottomWidth: 1,
+    borderBottomColor: '#2C2C2E',
+    flexGrow: 0,
   },
-  navContent: { paddingHorizontal: 12, paddingVertical: 8, gap: 6, flexDirection: 'row' },
+  navContent: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   navPill: {
-    paddingHorizontal: 16,
-    paddingVertical: 7,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
     backgroundColor: '#2C2C2E',
+    borderWidth: 1,
+    borderColor: '#38383A',
   },
-  activePill: { backgroundColor: '#5856D6' },
-  navPillText: { fontSize: 13, color: '#8E8E93', fontWeight: '500' },
-  activePillText: { color: '#FFFFFF' },
-
+  activePill: {
+    backgroundColor: '#007AFF',
+    borderColor: '#007AFF',
+  },
+  navPillText: {
+    fontSize: 12,
+    color: '#8E8E93',
+    fontWeight: '600',
+  },
+  activePillText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
   content: { flex: 1 },
-  section: { paddingHorizontal: 16, paddingTop: 20 },
+  section: { paddingHorizontal: 16, paddingTop: 16 },
   sectionLabel: {
     fontSize: 11,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: '#8E8E93',
     letterSpacing: 0.5,
     textTransform: 'uppercase',
     marginBottom: 12,
   },
-
-  // Video cards
-  videoCard: {
+  storyCard: {
     backgroundColor: '#1C1C1E',
     borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 16,
-    borderWidth: 0.5,
-    borderColor: '#38383A',
+    borderWidth: 1,
+    borderColor: '#2C2C2E',
   },
-  videoThumb: {
-    height: 160,
-    backgroundColor: '#1a1a2e',
+  storyThumb: {
+    height: 140,
+    backgroundColor: '#14202C',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  liveBadge: {
+  compBadge: {
     position: 'absolute',
     top: 10,
     left: 10,
-    backgroundColor: '#FF3B30',
+    backgroundColor: '#30D158',
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: 6,
   },
-  liveBadgeText: { fontSize: 11, color: '#FFFFFF', fontWeight: '600' },
+  compBadgeText: { fontSize: 11, color: '#000000', fontWeight: 'bold' },
   playCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(0,122,255,0.8)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -635,156 +668,146 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   durationText: { fontSize: 11, color: '#FFFFFF' },
-  videoBody: { padding: 14 },
-  videoTag: { fontSize: 11, fontWeight: '600', marginBottom: 6 },
-  videoTitle: { fontSize: 16, fontWeight: 'bold', color: '#FFFFFF', marginBottom: 8, lineHeight: 22 },
-  videoMeta: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
+  storyBody: { padding: 14 },
+  storyTag: { fontSize: 10, fontWeight: 'bold', marginBottom: 4 },
+  storyTitle: { fontSize: 15, fontWeight: 'bold', color: '#FFFFFF', marginBottom: 8, lineHeight: 20 },
+  storyMeta: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
   avatar: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: { fontSize: 11, fontWeight: '600' },
-  videoAuthor: { fontSize: 12, color: '#8E8E93', flex: 1 },
-  videoStats: { flexDirection: 'row', gap: 16 },
-  videoStat: { fontSize: 12, color: '#8E8E93' },
-  videoStatValue: { color: '#FFFFFF', fontWeight: '600' },
-
-  // Podcast cards
-  podcastCard: {
-    backgroundColor: '#1C1C1E',
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    borderWidth: 0.5,
-    borderColor: '#38383A',
-  },
-  podIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  podIconEmoji: { fontSize: 24 },
-  podInfo: { flex: 1 },
-  podTitle: { fontSize: 14, fontWeight: '600', color: '#FFFFFF', marginBottom: 3 },
-  podSub: { fontSize: 12, color: '#8E8E93', marginBottom: 8 },
-  podProgressBar: {
-    height: 3,
-    backgroundColor: '#2C2C2E',
-    borderRadius: 2,
-    marginBottom: 5,
-  },
-  podProgressFill: { height: 3, borderRadius: 2 },
-  podTime: { fontSize: 11, color: '#8E8E93' },
-  podPlayBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  podPlayIcon: { fontSize: 14, color: '#FFFFFF', marginLeft: 2 },
-
-  // Article cards
-  articleCard: {
-    backgroundColor: '#1C1C1E',
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 10,
-    borderWidth: 0.5,
-    borderColor: '#38383A',
-  },
-  articleTop: { flexDirection: 'row', gap: 12, marginBottom: 10 },
-  articleIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  articleIconEmoji: { fontSize: 22 },
-  articleInfo: { flex: 1 },
-  articleTag: { fontSize: 11, fontWeight: '600', marginBottom: 4 },
-  articleTitle: { fontSize: 14, fontWeight: '600', color: '#FFFFFF', lineHeight: 20 },
-  articlePreview: { fontSize: 13, color: '#8E8E93', lineHeight: 19 },
-  articleFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 12,
-    paddingTop: 10,
-    borderTopWidth: 0.5,
-    borderTopColor: '#38383A',
-  },
-  articleAvatar: {
     width: 26,
     height: 26,
     borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  articleAvatarText: { fontSize: 10, fontWeight: '600' },
-  articleAuthor: { fontSize: 12, color: '#8E8E93', flex: 1 },
-  clapButton: {
-    backgroundColor: '#2C2C2E',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
-  },
-  clapText: { fontSize: 12, color: '#FFFFFF' },
-
-  // Global card
-  globalCard: {
+  avatarText: { fontSize: 10, fontWeight: 'bold' },
+  storyAuthor: { fontSize: 12, color: '#8E8E93', flex: 1 },
+  storyStats: { flexDirection: 'row', gap: 14 },
+  storyStat: { fontSize: 11, color: '#8E8E93' },
+  statValue: { color: '#FFFFFF', fontWeight: '600' },
+  podcastCard: {
     backgroundColor: '#1C1C1E',
     borderRadius: 14,
-    padding: 16,
-    borderWidth: 0.5,
-    borderColor: '#38383A',
+    padding: 12,
+    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    borderWidth: 1,
+    borderColor: '#2C2C2E',
   },
-  globeRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
-  globeIcon: {
-    width: 44,
-    height: 44,
-    backgroundColor: '#1a2a3a',
+  podIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  podIconEmoji: { fontSize: 22 },
+  podInfo: { flex: 1 },
+  podTitle: { fontSize: 13, fontWeight: '600', color: '#FFFFFF', marginBottom: 2 },
+  podSub: { fontSize: 11, color: '#8E8E93', marginBottom: 6 },
+  podProgressBar: {
+    height: 3,
+    backgroundColor: '#2C2C2E',
+    borderRadius: 2,
+    marginBottom: 4,
+  },
+  podProgressFill: { height: 3, borderRadius: 2 },
+  podTime: { fontSize: 10, color: '#8E8E93' },
+  podPlayBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  podPlayIcon: { fontSize: 12, color: '#FFFFFF', marginLeft: 2 },
+  articleCard: {
+    backgroundColor: '#1C1C1E',
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#2C2C2E',
+  },
+  articleTop: { flexDirection: 'row', gap: 10, marginBottom: 8 },
+  articleIconWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  articleIconEmoji: { fontSize: 20 },
+  articleInfo: { flex: 1 },
+  articleTag: { fontSize: 10, fontWeight: 'bold', marginBottom: 2 },
+  articleTitle: { fontSize: 14, fontWeight: 'bold', color: '#FFFFFF', lineHeight: 18 },
+  articlePreview: { fontSize: 12, color: '#A0A0A0', lineHeight: 17 },
+  articleFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 10,
+    paddingTop: 8,
+    borderTopWidth: 0.5,
+    borderTopColor: '#2C2C2E',
+  },
+  articleAvatar: {
+    width: 24,
+    height: 24,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  globeEmoji: { fontSize: 22 },
-  globeTitle: { fontSize: 15, fontWeight: '600', color: '#FFFFFF' },
-  globeSub: { fontSize: 12, color: '#8E8E93' },
-  countryChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  countryChip: {
+  articleAvatarText: { fontSize: 10, fontWeight: 'bold' },
+  articleAuthor: { fontSize: 11, color: '#8E8E93', flex: 1 },
+  clapButton: {
     backgroundColor: '#2C2C2E',
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
-  chipFlag: { fontSize: 14 },
-  chipText: { fontSize: 12, color: '#8E8E93' },
-
-  // Share CTA
-  shareBtn: {
-    backgroundColor: '#5856D6',
+  clapText: { fontSize: 11, color: '#FFFFFF' },
+  globalCard: {
+    backgroundColor: '#1C1C1E',
     borderRadius: 14,
     padding: 14,
+    borderWidth: 1,
+    borderColor: '#2C2C2E',
+  },
+  globeRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
+  globeIcon: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#1A2A3A',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  globeEmoji: { fontSize: 20 },
+  globeTitle: { fontSize: 14, fontWeight: 'bold', color: '#FFFFFF' },
+  globeSub: { fontSize: 11, color: '#8E8E93' },
+  stateChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  stateChip: {
+    backgroundColor: '#2C2C2E',
+    borderRadius: 14,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  stateFlag: { fontSize: 12 },
+  stateText: { fontSize: 11, color: '#A0A0A0' },
+  shareBtn: {
+    backgroundColor: '#007AFF',
+    borderRadius: 16,
+    paddingVertical: 12,
     alignItems: 'center',
     marginBottom: 6,
   },
-  shareBtnText: { fontSize: 15, fontWeight: '600', color: '#FFFFFF' },
-  shareSub: { fontSize: 12, color: '#8E8E93', textAlign: 'center' },
-
-  // Modal
+  shareBtnText: { fontSize: 14, fontWeight: 'bold', color: '#FFFFFF' },
+  shareSub: { fontSize: 11, color: '#8E8E93', textAlign: 'center' },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.8)',
@@ -801,61 +824,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 10,
   },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', color: '#FFFFFF' },
-  modalClose: {
-    backgroundColor: '#2C2C2E',
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalCloseText: { fontSize: 14, color: '#FFFFFF', fontWeight: '600' },
-  modalSub: { fontSize: 13, color: '#8E8E93', marginBottom: 16 },
-  typeRow: { flexDirection: 'row', gap: 8, marginBottom: 20 },
+  modalTitle: { fontSize: 16, fontWeight: 'bold', color: '#FFFFFF' },
+  modalCloseText: { fontSize: 16, color: '#FFFFFF', fontWeight: '600' },
+  modalSub: { fontSize: 12, color: '#8E8E93', marginBottom: 12 },
+  typeRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
   typePill: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 14,
     backgroundColor: '#2C2C2E',
-    alignItems: 'center',
   },
-  activeTypePill: { backgroundColor: '#5856D6' },
-  typePillText: { fontSize: 13, color: '#8E8E93', fontWeight: '500' },
-  activeTypePillText: { color: '#FFFFFF' },
-  inputLabel: { fontSize: 14, fontWeight: '600', color: '#FFFFFF', marginBottom: 8 },
+  activeTypePill: { backgroundColor: '#007AFF' },
+  typePillText: { fontSize: 12, color: '#8E8E93', fontWeight: '500' },
+  activeTypePillText: { color: '#FFFFFF', fontWeight: 'bold' },
+  inputLabel: { fontSize: 12, fontWeight: '600', color: '#FFFFFF', marginBottom: 4, marginTop: 8 },
   textInput: {
     backgroundColor: '#2C2C2E',
-    borderRadius: 12,
-    padding: 14,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     color: '#FFFFFF',
-    fontSize: 15,
-    marginBottom: 16,
+    fontSize: 13,
   },
-  textArea: { minHeight: 100, textAlignVertical: 'top' },
-  uploadArea: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 12,
-    padding: 20,
-    alignItems: 'center',
-    marginBottom: 16,
-    borderWidth: 0.5,
-    borderColor: '#38383A',
-    borderStyle: 'dashed',
-  },
-  uploadIcon: { fontSize: 28, marginBottom: 8 },
-  uploadText: { fontSize: 14, color: '#FFFFFF', fontWeight: '500', marginBottom: 4 },
-  uploadSub: { fontSize: 12, color: '#8E8E93' },
+  textArea: { minHeight: 90 },
   submitBtn: {
     backgroundColor: '#30D158',
-    borderRadius: 14,
-    padding: 14,
+    borderRadius: 18,
+    paddingVertical: 12,
     alignItems: 'center',
+    marginTop: 16,
   },
   disabledBtn: { backgroundColor: '#2C2C2E' },
-  submitBtnText: { fontSize: 15, fontWeight: '600', color: '#FFFFFF' },
+  submitBtnText: { fontSize: 14, fontWeight: 'bold', color: '#000000' },
 });
 
 export default SuccessNetwork;

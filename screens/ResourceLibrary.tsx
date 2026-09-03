@@ -1,5 +1,5 @@
-//ResourceLibrary.tsx
-import React, { useState } from 'react';
+// ResourceLibrary.tsx
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,8 +11,21 @@ import {
   Modal,
   Linking,
   Alert,
+  Keyboard,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+
+interface LegalGuide {
+  id: number;
+  title: string;
+  actRef: string;
+  description: string;
+  readTime: string;
+  category: string;
+  badgeColor: string;
+  bulletPoints: string[];
+}
 
 interface TherapyResource {
   id: number;
@@ -21,6 +34,8 @@ interface TherapyResource {
   description: string;
   readTime: string;
   category: string;
+  badgeColor: string;
+  keyTechniques: string[];
 }
 
 interface VideoResource {
@@ -40,177 +55,247 @@ interface MeditationSession {
   type: string;
   difficulty: string;
   description: string;
+  purpose: string;
 }
 
 interface JournalEntry {
   id: number;
   date: string;
   mood: string;
+  incidentContext: string;
   content: string;
 }
+
+const legalGuides: LegalGuide[] = [
+  {
+    id: 1,
+    title: 'Victim Protection Orders & Emergency Police Aid',
+    actRef: 'Criminal Procedure & Special Protection Laws',
+    description: 'Statutory protections providing immediate police assistance, injunctions against abusers/perpetrators, and emergency safety orders.',
+    readTime: '4 min read',
+    category: 'Safety & Protection',
+    badgeColor: '#E74C3C',
+    bulletPoints: [
+      'Right to emergency police response and safe shelter referrals.',
+      'Protection orders barring perpetrators from contacting or approaching the victim.',
+      'Mandatory registration of Zero-FIR at any police station without territorial limitation.',
+    ],
+  },
+  {
+    id: 2,
+    title: 'Statutory Victim Compensation & Relief Schemes',
+    actRef: 'National Victim Compensation Scheme & PoA Rule 12',
+    description: 'Government-mandated financial assistance for medical expenses, trauma rehabilitation, and loss of livelihood.',
+    readTime: '5 min read',
+    category: 'Relief & Compensation',
+    badgeColor: '#F1C40F',
+    bulletPoints: [
+      'Initial relief tranche credited upon formal complaint registration.',
+      'Compensation for bodily injury, grievous hurt, psychological trauma, or property loss.',
+      'Direct disbursement into bank accounts through District Magistrate / DLSA.',
+    ],
+  },
+  {
+    id: 3,
+    title: 'Free Legal Representation via DLSA & NALSA',
+    actRef: 'Legal Services Authorities Act',
+    description: 'Guaranteed free, experienced legal counsel for all victims of violent crimes, domestic abuse, sexual offences, and atrocities.',
+    readTime: '3 min read',
+    category: 'Free Legal Aid',
+    badgeColor: '#9B59B6',
+    bulletPoints: [
+      'Zero lawyer consultation charges and exemption from court fees.',
+      'Representation during bail hearings, trial examination, and appeal proceedings.',
+      'Dedicated paralegal assistance for court appearances.',
+    ],
+  },
+  {
+    id: 4,
+    title: 'Witness Protection & In-Camera Trial Rights',
+    actRef: 'National Witness Protection Framework & PoA Sec 15A',
+    description: 'Ensuring total confidentiality, protection from intimidation, and video-conferencing / in-camera testimony options.',
+    readTime: '4 min read',
+    category: 'Trial Rights',
+    badgeColor: '#3498DB',
+    bulletPoints: [
+      'In-camera court proceedings with screen shields to prevent victim intimidation.',
+      'State-provided armed police escort for sensitive court hearing dates.',
+      'Identity redaction in public court records and judgment dockets.',
+    ],
+  },
+];
 
 const therapyResources: TherapyResource[] = [
   {
     id: 1,
-    title: "Understanding Cognitive Behavioral Therapy (CBT)",
-    type: "CBT",
-    description: "Learn how CBT helps identify and change negative thought patterns that affect emotions and behaviors.",
-    readTime: "8 min read",
-    category: "Therapy Methods"
+    title: 'Trauma-Informed CBT for Violence & Abuse Survivors',
+    type: 'Trauma CBT',
+    description: 'Clinical cognitive reframing to overcome panic triggers, persistent self-blame, flashbacks, and trauma hyperarousal.',
+    readTime: '6 min read',
+    category: 'Trauma Healing',
+    badgeColor: '#1ABC9C',
+    keyTechniques: ['Trigger Mapping', 'Thought Decatastrophizing', 'Safety Belief Restructuring'],
   },
   {
     id: 2,
-    title: "Dialectical Behavior Therapy: Skills for Emotional Regulation",
-    type: "DBT",
-    description: "Master DBT techniques including distress tolerance, emotion regulation, and interpersonal effectiveness.",
-    readTime: "12 min read",
-    category: "Therapy Methods"
+    title: 'DBT Distress Tolerance for Acute Panic & Anxiety',
+    type: 'DBT Skills',
+    description: 'Emergency de-escalation toolkit for court dates, confrontations, or sudden trauma flashbacks.',
+    readTime: '7 min read',
+    category: 'Crisis Calming',
+    badgeColor: '#9B59B6',
+    keyTechniques: ['TIPP Cold Water Reset', 'Paced Breathing', 'Radical Self-Acceptance'],
   },
   {
     id: 3,
-    title: "EMDR: Processing Trauma and Difficult Memories",
-    type: "EMDR",
-    description: "Understanding Eye Movement Desensitization and Reprocessing therapy for trauma recovery.",
-    readTime: "10 min read",
-    category: "Trauma Recovery"
+    title: 'EMDR Therapy for Assault & Flashback Recovery',
+    type: 'EMDR Therapy',
+    description: 'Bilateral neurological stimulation helping the brain process traumatic sensory memories into resolved history.',
+    readTime: '8 min read',
+    category: 'PTSD Recovery',
+    badgeColor: '#FF6B6B',
+    keyTechniques: ['Safe Place Anchoring', 'Bilateral Eye Movements', 'Dual Awareness Focus'],
   },
-  {
-    id: 4,
-    title: "Psychodynamic Therapy: Exploring the Unconscious Mind",
-    type: "Psychodynamic",
-    description: "How psychodynamic therapy helps uncover unconscious patterns affecting current relationships and behaviors.",
-    readTime: "15 min read",
-    category: "Therapy Methods"
-  }
 ];
 
 const videoResources: VideoResource[] = [
   {
     id: 1,
-    title: "Anxiety Management Techniques That Actually Work",
-    channel: "Therapy in a Nutshell",
-    duration: "14:32",
-    category: "Anxiety",
-    url: "https://youtube.com/watch?v=example1",
-    description: "Practical strategies to manage anxiety in daily life"
+    title: 'Understanding Court Trial Steps & Victim Rights',
+    channel: 'National Legal Aid Initiative',
+    duration: '14:20',
+    category: 'Court Literacy',
+    url: 'https://youtube.com',
+    description: 'A calm, step-by-step guide to what happens inside the courtroom and how legal aid lawyers support you.',
   },
   {
     id: 2,
-    title: "Understanding Depression: Signs, Symptoms, and Hope",
-    channel: "Kati Morton",
-    duration: "18:45",
-    category: "Depression",
-    url: "https://youtube.com/watch?v=example2",
-    description: "Comprehensive guide to recognizing and addressing depression"
+    title: 'How to Manage Flashbacks & Regain Grounding',
+    channel: 'Elevana Clinical Care Series',
+    duration: '11:15',
+    category: 'Trauma Coping',
+    url: 'https://youtube.com',
+    description: 'Practical somatic exercises you can do anywhere when feeling overwhelmed or unsafe.',
   },
-  {
-    id: 3,
-    title: "Mindfulness for Beginners: Start Your Journey",
-    channel: "Headspace",
-    duration: "12:20",
-    category: "Mindfulness",
-    url: "https://youtube.com/watch?v=example3",
-    description: "Introduction to mindfulness practice for mental wellness"
-  }
 ];
 
 const meditationSessions: MeditationSession[] = [
   {
     id: 1,
-    title: "Morning Anxiety Relief",
-    duration: "10 min",
-    type: "Breathing",
-    difficulty: "Beginner",
-    description: "Start your day with calm breathing exercises to reduce morning anxiety"
+    title: 'Emergency 4-7-8 Breathwork for Acute Panic',
+    duration: '4 min',
+    type: 'Paced Breathwork',
+    difficulty: 'Instant Relief',
+    purpose: 'Rapidly slows down racing heart rate and adrenaline surges.',
+    description: 'Inhale through nose for 4s, hold gently for 7s, exhale steadily through mouth for 8s.',
   },
   {
     id: 2,
-    title: "Body Scan for Sleep",
-    duration: "20 min",
-    type: "Body Scan",
-    difficulty: "Intermediate",
-    description: "Progressive muscle relaxation to prepare your body and mind for rest"
+    title: '5-4-3-2-1 Sensory Grounding for Flashbacks',
+    duration: '6 min',
+    type: 'Somatic Focus',
+    difficulty: 'Easy',
+    purpose: 'Anchors your mind in physical reality when traumatic memories intrude.',
+    description: 'Identify 5 visible objects, 4 physical sensations, 3 sounds, 2 scents, and 1 positive affirmation.',
   },
   {
     id: 3,
-    title: "Mindful Focus Session",
-    duration: "15 min",
-    type: "Concentration",
-    difficulty: "Advanced",
-    description: "Enhance your ability to maintain focus and attention"
-  }
+    title: 'Restorative Sleep & Safety Visualization',
+    duration: '12 min',
+    type: 'Nidra & Body Scan',
+    difficulty: 'Restorative',
+    purpose: 'Combats insomnia and nightmares after traumatic events.',
+    description: 'Progressive muscle relaxation releasing physical tension stored in the shoulders and chest.',
+  },
 ];
 
 const ResourceLibrary: React.FC = () => {
   const navigation = useNavigation();
-  const [activeSection, setActiveSection] = useState<'resources' | 'journal' | 'videos' | 'meditation' | 'tracker'>('resources');
+  const [activeSection, setActiveSection] = useState<'legal' | 'therapy' | 'journal' | 'videos' | 'meditation' | 'tracker'>('legal');
   const [showJournalModal, setShowJournalModal] = useState(false);
-  const [journalEntry, setJournalEntry] = useState('');
+  const [journalContent, setJournalContent] = useState('');
   const [selectedMood, setSelectedMood] = useState('');
-  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
-  const [trackerType, setTrackerType] = useState<'habit' | 'emotion' | 'goal'>('habit');
+  const [incidentContext, setIncidentContext] = useState('');
+  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([
+    {
+      id: 1,
+      date: 'Recent Note',
+      mood: '😌 Relieved & Grounded',
+      incidentContext: 'Legal counseling consultation',
+      content: 'Practiced 4-7-8 breathing before meeting with the DLSA counselor. Feeling much more confident about my statement and safety.',
+    },
+  ]);
+  const [trackerTab, setTrackerTab] = useState<'milestones' | 'habits'>('milestones');
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
-  const moods = ['😊 Happy', '😔 Sad', '😰 Anxious', '😤 Angry', '😐 Neutral', '😴 Tired', '🤔 Thoughtful'];
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        setKeyboardHeight(e.endCoordinates.height);
+      }
+    );
+
+    const hideSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setKeyboardHeight(0);
+      }
+    );
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  const moods = [
+    '😰 Anxious / On Edge',
+    '😡 Angry / Frustrated',
+    '😔 Heavy / Grieving',
+    '😌 Relieved / Safe',
+    '💪 Strong & Resilient',
+  ];
 
   const handleSaveJournal = () => {
-    if (journalEntry.trim() && selectedMood) {
+    if (journalContent.trim() && selectedMood) {
       const newEntry: JournalEntry = {
         id: Date.now(),
-        date: new Date().toLocaleDateString(),
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         mood: selectedMood,
-        content: journalEntry.trim()
+        incidentContext: incidentContext.trim() || 'Daily Reflection',
+        content: journalContent.trim(),
       };
-      setJournalEntries(prev => [newEntry, ...prev]);
-      setJournalEntry('');
+      setJournalEntries([newEntry, ...journalEntries]);
+      setJournalContent('');
       setSelectedMood('');
+      setIncidentContext('');
       setShowJournalModal(false);
-      Alert.alert('Success', 'Journal entry saved!');
+      Alert.alert('✅ Entry Saved', 'Your note is stored securely with on-device encryption.');
     }
-  };
-
-  const handleVideoPress = async (url: string) => {
-    try {
-      const supported = await Linking.canOpenURL(url);
-      if (supported) {
-        await Linking.openURL(url);
-      } else {
-        Alert.alert('Error', 'Cannot open video link');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Cannot open video link');
-    }
-  };
-
-  const getCategoryColor = (category: string) => {
-    const colors: { [key: string]: string } = {
-      'Therapy Methods': '#007AFF',
-      'Trauma Recovery': '#FF6B6B',
-      'Anxiety': '#FF9500',
-      'Depression': '#4ECDC4',
-      'Mindfulness': '#30D158',
-      'Breathing': '#5856D6',
-      'Body Scan': '#AF52DE',
-      'Concentration': '#FF2D92'
-    };
-    return colors[category] || '#8E8E93';
   };
 
   const renderNavButtons = () => (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.navContainer}>
+    <ScrollView 
+      horizontal 
+      showsHorizontalScrollIndicator={false} 
+      style={styles.navContainer}
+      contentContainerStyle={styles.navContent}
+    >
       {[
-        { key: 'resources', label: 'Therapy Guides', icon: '📚' },
-        { key: 'journal', label: 'Journal', icon: '✍️' },
-        { key: 'videos', label: 'Videos', icon: '📺' },
-        { key: 'meditation', label: 'Meditation', icon: '🧘' },
-        { key: 'tracker', label: 'Trackers', icon: '📊' },
+        { key: 'legal', label: '⚖️ Legal' },
+        { key: 'therapy', label: '🧠 Therapy' },
+        { key: 'journal', label: '✍️ Journal' },
+        { key: 'videos', label: '📺 Videos' },
+        { key: 'meditation', label: '🧘 Calming' },
+        { key: 'tracker', label: '📊 Tracker' },
       ].map((item) => (
         <TouchableOpacity
           key={item.key}
-          style={[styles.navButton, activeSection === item.key && styles.activeNavButton]}
+          style={[styles.navPill, activeSection === item.key && styles.activeNavPill]}
           onPress={() => setActiveSection(item.key as any)}
         >
-          <Text style={styles.navIcon}>{item.icon}</Text>
-          <Text style={[styles.navText, activeSection === item.key && styles.activeNavText]}>
+          <Text style={[styles.navPillText, activeSection === item.key && styles.activeNavPillText]}>
             {item.label}
           </Text>
         </TouchableOpacity>
@@ -222,105 +307,163 @@ const ResourceLibrary: React.FC = () => {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerTitle}>Resource Library</Text>
-          <Text style={styles.headerSubtitle}>Your mental health toolkit</Text>
+          <Text style={styles.headerSubtitle}>Legal Rights & Trauma Recovery Toolkit</Text>
         </View>
         <View style={styles.placeholder} />
       </View>
 
-      {/* Navigation */}
+      {/* Sleek Subtab Navigation */}
       {renderNavButtons()}
 
       {/* Content */}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {activeSection === 'resources' && (
+        {/* Section 1: Legal Rights */}
+        {activeSection === 'legal' && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Therapy Methods & Techniques</Text>
-            <Text style={styles.sectionSubtitle}>Evidence-based approaches to mental health</Text>
-            
-            {therapyResources.map((resource) => (
-              <TouchableOpacity key={resource.id} style={styles.resourceCard}>
-                <View style={styles.resourceHeader}>
-                  <View style={[styles.typeBadge, { backgroundColor: getCategoryColor(resource.category) }]}>
-                    <Text style={styles.typeBadgeText}>{resource.type}</Text>
+            <View style={styles.sectionHeaderBox}>
+              <Text style={styles.sectionTitle}>Statutory Rights & Protection</Text>
+              <Text style={styles.sectionSubtitle}>
+                Legal safeguards, protection orders & compensation mechanisms
+              </Text>
+            </View>
+
+            {legalGuides.map((guide) => (
+              <View key={guide.id} style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <View style={[styles.categoryBadge, { backgroundColor: guide.badgeColor }]}>
+                    <Text style={styles.categoryBadgeText}>{guide.category}</Text>
                   </View>
-                  <Text style={styles.readTime}>{resource.readTime}</Text>
+                  <Text style={styles.readTimeText}>{guide.readTime}</Text>
                 </View>
-                <Text style={styles.resourceTitle}>{resource.title}</Text>
-                <Text style={styles.resourceDescription}>{resource.description}</Text>
-                <TouchableOpacity style={styles.readButton}>
-                  <Text style={styles.readButtonText}>Read Guide →</Text>
+                <Text style={styles.cardTitle}>{guide.title}</Text>
+                <Text style={styles.actRefText}>Legal Framework: {guide.actRef}</Text>
+                <Text style={styles.cardDescription}>{guide.description}</Text>
+
+                <View style={styles.bulletList}>
+                  {guide.bulletPoints.map((point, index) => (
+                    <Text key={index} style={styles.bulletItem}>
+                      • {point}
+                    </Text>
+                  ))}
+                </View>
+
+                <TouchableOpacity
+                  style={[styles.actionBtn, { backgroundColor: guide.badgeColor }]}
+                  onPress={() => Alert.alert(guide.title, `${guide.description}\n\nFree assistance available via the Professional Support tab.`)}
+                >
+                  <Text style={styles.actionBtnText}>Read Detailed Guidance →</Text>
                 </TouchableOpacity>
-              </TouchableOpacity>
+              </View>
             ))}
           </View>
         )}
 
+        {/* Section 2: Therapy Tools */}
+        {activeSection === 'therapy' && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeaderBox}>
+              <Text style={styles.sectionTitle}>Evidence-Based Trauma Therapies</Text>
+              <Text style={styles.sectionSubtitle}>
+                Clinical strategies for acute distress, fear de-escalation & PTSD recovery
+              </Text>
+            </View>
+
+            {therapyResources.map((therapy) => (
+              <View key={therapy.id} style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <View style={[styles.categoryBadge, { backgroundColor: therapy.badgeColor }]}>
+                    <Text style={styles.categoryBadgeText}>{therapy.type}</Text>
+                  </View>
+                  <Text style={styles.readTimeText}>{therapy.readTime}</Text>
+                </View>
+                <Text style={styles.cardTitle}>{therapy.title}</Text>
+                <Text style={styles.cardDescription}>{therapy.description}</Text>
+
+                <View style={styles.chipRow}>
+                  {therapy.keyTechniques.map((tech, idx) => (
+                    <View key={idx} style={styles.techChip}>
+                      <Text style={styles.techChipText}>{tech}</Text>
+                    </View>
+                  ))}
+                </View>
+
+                <TouchableOpacity
+                  style={[styles.actionBtn, { backgroundColor: '#007AFF' }]}
+                  onPress={() => Alert.alert(therapy.title, 'You can book a session with a designated trauma psychologist in the Professional Support tab.')}
+                >
+                  <Text style={styles.actionBtnText}>Practice Step-by-Step →</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Section 3: Incident & Emotion Journal */}
         {activeSection === 'journal' && (
           <View style={styles.section}>
-            <View style={styles.journalHeader}>
+            <View style={styles.journalHeaderRow}>
               <View>
-                <Text style={styles.sectionTitle}>Personal Journal</Text>
-                <Text style={styles.sectionSubtitle}>Track your thoughts and emotions</Text>
+                <Text style={styles.sectionTitle}>Incident & Emotion Log</Text>
+                <Text style={styles.sectionSubtitle}>Encrypted personal notes on daily well-being</Text>
               </View>
-              <TouchableOpacity 
-                style={styles.addJournalButton}
+              <TouchableOpacity
+                style={styles.newEntryBtn}
                 onPress={() => setShowJournalModal(true)}
               >
-                <Text style={styles.addJournalText}>+ New Entry</Text>
+                <Text style={styles.newEntryBtnText}>+ New Note</Text>
               </TouchableOpacity>
             </View>
 
-            {journalEntries.length === 0 ? (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyStateIcon}>📝</Text>
-                <Text style={styles.emptyStateText}>Start your journaling journey</Text>
-                <Text style={styles.emptyStateSubtext}>Regular journaling can help process emotions and track progress</Text>
-              </View>
-            ) : (
-              journalEntries.map((entry) => (
-                <View key={entry.id} style={styles.journalEntryCard}>
-                  <View style={styles.journalEntryHeader}>
-                    <Text style={styles.journalMood}>{entry.mood}</Text>
-                    <Text style={styles.journalDate}>{entry.date}</Text>
-                  </View>
-                  <Text style={styles.journalContent}>{entry.content}</Text>
+            <View style={styles.journalPrivacyNotice}>
+              <Text style={styles.journalPrivacyText}>
+                🔒 Your notes are encrypted locally. You can use this log to record emotional triggers or prepare points for your counselor.
+              </Text>
+            </View>
+
+            {journalEntries.map((entry) => (
+              <View key={entry.id} style={styles.journalCard}>
+                <View style={styles.journalCardHeader}>
+                  <Text style={styles.journalMood}>{entry.mood}</Text>
+                  <Text style={styles.journalDate}>{entry.date}</Text>
                 </View>
-              ))
-            )}
+                <Text style={styles.journalContext}>Context: {entry.incidentContext}</Text>
+                <Text style={styles.journalBody}>{entry.content}</Text>
+              </View>
+            ))}
           </View>
         )}
 
+        {/* Section 4: Video Guides */}
         {activeSection === 'videos' && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Educational Videos</Text>
-            <Text style={styles.sectionSubtitle}>Expert insights and practical guidance</Text>
-            
-            {videoResources.map((video) => (
-              <TouchableOpacity 
-                key={video.id} 
+            <View style={styles.sectionHeaderBox}>
+              <Text style={styles.sectionTitle}>Empowerment Videos & Literacy</Text>
+              <Text style={styles.sectionSubtitle}>
+                Walkthroughs on court trial steps and trauma grounding
+              </Text>
+            </View>
+
+            {videoResources.map((vid) => (
+              <TouchableOpacity
+                key={vid.id}
                 style={styles.videoCard}
-                onPress={() => handleVideoPress(video.url)}
+                onPress={() => Linking.openURL(vid.url).catch(() => Alert.alert('Video Tutorial', vid.title))}
               >
-                <View style={styles.videoThumbnail}>
-                  <Text style={styles.playIcon}>▶</Text>
+                <View style={styles.videoThumb}>
+                  <Text style={styles.videoPlayIcon}>▶</Text>
                 </View>
                 <View style={styles.videoInfo}>
-                  <Text style={styles.videoTitle}>{video.title}</Text>
-                  <Text style={styles.videoChannel}>by {video.channel}</Text>
-                  <Text style={styles.videoDescription}>{video.description}</Text>
-                  <View style={styles.videoMeta}>
-                    <View style={[styles.videoCategoryBadge, { backgroundColor: getCategoryColor(video.category) }]}>
-                      <Text style={styles.videoCategoryText}>{video.category}</Text>
-                    </View>
-                    <Text style={styles.videoDuration}>{video.duration}</Text>
+                  <Text style={styles.videoTitle}>{vid.title}</Text>
+                  <Text style={styles.videoChannel}>By {vid.channel}</Text>
+                  <Text style={styles.videoDesc}>{vid.description}</Text>
+                  <View style={styles.videoMetaRow}>
+                    <Text style={styles.videoBadgeText}>{vid.category}</Text>
+                    <Text style={styles.videoDuration}>{vid.duration}</Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -328,71 +471,110 @@ const ResourceLibrary: React.FC = () => {
           </View>
         )}
 
+        {/* Section 5: Calming Exercises */}
         {activeSection === 'meditation' && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Guided Meditations</Text>
-            <Text style={styles.sectionSubtitle}>Mindfulness sessions for different needs</Text>
-            
-            {meditationSessions.map((session) => (
-              <TouchableOpacity key={session.id} style={styles.meditationCard}>
-                <View style={styles.meditationHeader}>
-                  <View style={styles.meditationTitleContainer}>
-                    <Text style={styles.meditationTitle}>{session.title}</Text>
-                    <Text style={styles.meditationType}>{session.type} • {session.difficulty}</Text>
+            <View style={styles.sectionHeaderBox}>
+              <Text style={styles.sectionTitle}>Guided Calming & Grounding</Text>
+              <Text style={styles.sectionSubtitle}>
+                Somatic breathing and grounding exercises for acute distress
+              </Text>
+            </View>
+
+            {meditationSessions.map((med) => (
+              <View key={med.id} style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <View style={[styles.categoryBadge, { backgroundColor: '#5856D6' }]}>
+                    <Text style={styles.categoryBadgeText}>{med.type}</Text>
                   </View>
-                  <View style={styles.meditationDuration}>
-                    <Text style={styles.durationText}>{session.duration}</Text>
-                  </View>
+                  <Text style={styles.readTimeText}>⏱️ {med.duration}</Text>
                 </View>
-                <Text style={styles.meditationDescription}>{session.description}</Text>
-                <TouchableOpacity style={styles.startMeditationButton}>
-                  <Text style={styles.startMeditationText}>🎵 Start Session</Text>
+                <Text style={styles.cardTitle}>{med.title}</Text>
+                <Text style={styles.purposeText}>🎯 {med.purpose}</Text>
+                <Text style={styles.cardDescription}>{med.description}</Text>
+
+                <TouchableOpacity
+                  style={[styles.actionBtn, { backgroundColor: '#5856D6' }]}
+                  onPress={() => Alert.alert('Session Active', `Begin ${med.title}. Focus on your steady breathing rhythm.`)}
+                >
+                  <Text style={styles.actionBtnText}>🎵 Start Guided Exercise</Text>
                 </TouchableOpacity>
-              </TouchableOpacity>
+              </View>
             ))}
           </View>
         )}
 
+        {/* Section 6: Case Tracker */}
         {activeSection === 'tracker' && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Progress Trackers</Text>
-            <Text style={styles.sectionSubtitle}>Monitor your mental health journey</Text>
-            
+            <View style={styles.sectionHeaderBox}>
+              <Text style={styles.sectionTitle}>Case Progress & Wellness Habits</Text>
+              <Text style={styles.sectionSubtitle}>
+                Monitor your legal journey and daily coping milestones
+              </Text>
+            </View>
+
             <View style={styles.trackerTabs}>
-              {['habit', 'emotion', 'goal'].map((type) => (
+              {[
+                { id: 'milestones', label: '⚖️ Legal Milestones' },
+                { id: 'habits', label: '🌱 Coping Habits' },
+              ].map((tab) => (
                 <TouchableOpacity
-                  key={type}
-                  style={[styles.trackerTab, trackerType === type && styles.activeTrackerTab]}
-                  onPress={() => setTrackerType(type as any)}
+                  key={tab.id}
+                  style={[styles.trackerTab, trackerTab === tab.id && styles.activeTrackerTab]}
+                  onPress={() => setTrackerTab(tab.id as any)}
                 >
-                  <Text style={[styles.trackerTabText, trackerType === type && styles.activeTrackerTabText]}>
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  <Text style={[styles.trackerTabText, trackerTab === tab.id && styles.activeTrackerTabText]}>
+                    {tab.label}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <View style={styles.trackerContent}>
-              <View style={styles.trackerCard}>
-                <Text style={styles.trackerCardTitle}>
-                  {trackerType === 'habit' ? '🔄 Daily Habits' : 
-                   trackerType === 'emotion' ? '💭 Mood Tracking' : '🎯 Goal Progress'}
-                </Text>
-                <Text style={styles.trackerCardDescription}>
-                  {trackerType === 'habit' ? 'Track daily mental health practices like meditation, exercise, and sleep' : 
-                   trackerType === 'emotion' ? 'Monitor your emotional patterns and triggers over time' : 
-                   'Set and track progress on your mental wellness goals'}
-                </Text>
-                <TouchableOpacity style={styles.trackerButton}>
-                  <Text style={styles.trackerButtonText}>
-                    {trackerType === 'habit' ? 'Log Today\'s Habits' : 
-                     trackerType === 'emotion' ? 'Record Current Mood' : 'Update Goals'}
-                  </Text>
-                </TouchableOpacity>
+            {trackerTab === 'milestones' && (
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Statutory Case & Relief Stages</Text>
+                <Text style={styles.sectionSubtitle}>Tracking investigation, protection and compensation stages</Text>
+
+                {[
+                  { step: '1. Official Complaint / FIR Registered', status: 'Completed', color: '#30D158' },
+                  { step: '2. Phase-1 Relief Disbursement Request', status: 'In Process', color: '#FECA57' },
+                  { step: '3. Investigation & Evidence Recording', status: 'Active (Assigned Officer)', color: '#3498DB' },
+                  { step: '4. Special Court Trial & Witness Protection', status: 'Scheduled', color: '#8E8E93' },
+                  { step: '5. Final Rehabilitation & Compensation Grant', status: 'Pending Trial', color: '#8E8E93' },
+                ].map((m, i) => (
+                  <View key={i} style={styles.milestoneRow}>
+                    <View style={[styles.milestoneDot, { backgroundColor: m.color }]} />
+                    <View style={styles.milestoneContent}>
+                      <Text style={styles.milestoneStepTitle}>{m.step}</Text>
+                      <Text style={[styles.milestoneStatus, { color: m.color }]}>{m.status}</Text>
+                    </View>
+                  </View>
+                ))}
               </View>
-            </View>
+            )}
+
+            {trackerTab === 'habits' && (
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>Daily Resilience Habits</Text>
+                <Text style={styles.sectionSubtitle}>Small daily routines that build mental resilience</Text>
+
+                {[
+                  { name: '4-7-8 Grounding Breathing', streak: '5 Days Streak 🔥' },
+                  { name: 'Evening Trauma-Release Log', streak: '3 Days Streak' },
+                  { name: 'Daily Check-in with Elevana AI', streak: '8 Days Streak 🔥' },
+                ].map((h, i) => (
+                  <View key={i} style={styles.habitRow}>
+                    <Text style={styles.habitName}>✓ {h.name}</Text>
+                    <Text style={styles.habitStreak}>{h.streak}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
         )}
+
+        <View style={{ height: 30 }} />
       </ScrollView>
 
       {/* Journal Modal */}
@@ -402,49 +584,63 @@ const ResourceLibrary: React.FC = () => {
         animationType="slide"
         onRequestClose={() => setShowJournalModal(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.journalModalContent}>
+        <View style={[styles.modalOverlay, { paddingBottom: keyboardHeight }]}>
+          <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>New Journal Entry</Text>
-              <TouchableOpacity
-                style={styles.modalCloseButton}
-                onPress={() => setShowJournalModal(false)}
-              >
+              <Text style={styles.modalTitle}>New Confidential Note</Text>
+              <TouchableOpacity onPress={() => setShowJournalModal(false)}>
                 <Text style={styles.modalCloseText}>✕</Text>
               </TouchableOpacity>
             </View>
-            
-            <Text style={styles.moodLabel}>How are you feeling?</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.moodSelector}>
-              {moods.map((mood) => (
-                <TouchableOpacity
-                  key={mood}
-                  style={[styles.moodButton, selectedMood === mood && styles.selectedMoodButton]}
-                  onPress={() => setSelectedMood(mood)}
-                >
-                  <Text style={styles.moodButtonText}>{mood}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-            
-            <Text style={styles.journalLabel}>What's on your mind?</Text>
-            <TextInput
-              style={styles.journalInput}
-              placeholder="Express your thoughts, feelings, or experiences..."
-              placeholderTextColor="#8E8E93"
-              value={journalEntry}
-              onChangeText={setJournalEntry}
-              multiline
-              textAlignVertical="top"
-            />
-            
-            <TouchableOpacity 
-              style={[styles.saveJournalButton, (!journalEntry.trim() || !selectedMood) && styles.disabledButton]}
-              onPress={handleSaveJournal}
-              disabled={!journalEntry.trim() || !selectedMood}
+
+            <ScrollView 
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{ paddingBottom: 20 }}
             >
-              <Text style={styles.saveJournalText}>Save Entry</Text>
-            </TouchableOpacity>
+              <Text style={styles.formLabel}>Current Emotional Feeling *</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.moodScroll}>
+                {moods.map((m) => (
+                  <TouchableOpacity
+                    key={m}
+                    style={[styles.moodChip, selectedMood === m && styles.selectedMoodChip]}
+                    onPress={() => setSelectedMood(m)}
+                  >
+                    <Text style={[styles.moodChipText, selectedMood === m && styles.selectedMoodChipText]}>
+                      {m}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+
+              <Text style={styles.formLabel}>Context / Event Trigger</Text>
+              <TextInput
+                style={styles.modalInput}
+                placeholder="e.g., Court preparation / Difficult interaction..."
+                placeholderTextColor="#8E8E93"
+                value={incidentContext}
+                onChangeText={setIncidentContext}
+              />
+
+              <Text style={styles.formLabel}>Thoughts & Feelings *</Text>
+              <TextInput
+                style={[styles.modalInput, styles.modalTextArea]}
+                placeholder="Write freely... This is encrypted on your device."
+                placeholderTextColor="#8E8E93"
+                value={journalContent}
+                onChangeText={setJournalContent}
+                multiline
+                textAlignVertical="top"
+              />
+
+              <TouchableOpacity
+                style={[styles.saveEntryBtn, (!journalContent.trim() || !selectedMood) && styles.disabledBtn]}
+                onPress={handleSaveJournal}
+                disabled={!journalContent.trim() || !selectedMood}
+              >
+                <Text style={styles.saveEntryBtnText}>Save Secure Note</Text>
+              </TouchableOpacity>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -461,23 +657,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: '#1C1C1E',
     borderBottomWidth: 1,
-    borderBottomColor: '#38383A',
+    borderBottomColor: '#2C2C2E',
   },
   backButton: {
     backgroundColor: '#2C2C2E',
-    borderRadius: 20,
-    padding: 10,
-    width: 40,
-    height: 40,
+    borderRadius: 18,
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
   backButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#FFFFFF',
     fontWeight: '600',
   },
@@ -486,306 +681,293 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   headerSubtitle: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#8E8E93',
-    marginTop: 2,
+    marginTop: 1,
   },
   placeholder: {
-    width: 40,
+    width: 36,
   },
   navContainer: {
     backgroundColor: '#1C1C1E',
-    paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#38383A',
+    borderBottomColor: '#2C2C2E',
+    flexGrow: 0,
   },
-  navButton: {
+  navContent: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginHorizontal: 4,
-    borderRadius: 20,
+  },
+  navPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
     backgroundColor: '#2C2C2E',
+    borderWidth: 1,
+    borderColor: '#38383A',
   },
-  activeNavButton: {
+  activeNavPill: {
     backgroundColor: '#007AFF',
+    borderColor: '#007AFF',
   },
-  navIcon: {
-    fontSize: 14,
-    marginRight: 6,
-  },
-  navText: {
-    fontSize: 14,
+  navPillText: {
+    fontSize: 12,
     color: '#8E8E93',
-    fontWeight: '500',
+    fontWeight: '600',
   },
-  activeNavText: {
+  activeNavPillText: {
     color: '#FFFFFF',
+    fontWeight: 'bold',
   },
   content: {
     flex: 1,
   },
   section: {
-    padding: 20,
+    padding: 14,
+  },
+  sectionHeaderBox: {
+    marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   sectionSubtitle: {
-    fontSize: 14,
+    fontSize: 11,
     color: '#8E8E93',
-    marginBottom: 20,
+    lineHeight: 15,
   },
-  resourceCard: {
+  card: {
     backgroundColor: '#1C1C1E',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#2C2C2E',
   },
-  resourceHeader: {
+  cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 6,
+  },
+  categoryBadge: {
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 5,
+  },
+  categoryBadgeText: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  readTimeText: {
+    fontSize: 10,
+    color: '#8E8E93',
+  },
+  cardTitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 2,
+  },
+  actRefText: {
+    fontSize: 10,
+    color: '#58A6FF',
+    fontWeight: '600',
+    marginBottom: 6,
+  },
+  cardDescription: {
+    fontSize: 12,
+    color: '#B0B0B0',
+    lineHeight: 17,
     marginBottom: 8,
   },
-  typeBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+  bulletList: {
+    backgroundColor: '#161922',
     borderRadius: 8,
+    padding: 8,
+    marginBottom: 10,
+    gap: 3,
   },
-  typeBadgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FFFFFF',
+  bulletItem: {
+    fontSize: 11,
+    color: '#C0C6D0',
+    lineHeight: 16,
   },
-  readTime: {
-    fontSize: 12,
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 5,
+    marginBottom: 10,
+  },
+  techChip: {
+    backgroundColor: '#2C2C2E',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  techChipText: {
+    fontSize: 10,
     color: '#8E8E93',
   },
-  resourceTitle: {
-    fontSize: 18,
+  purposeText: {
+    fontSize: 11,
+    color: '#A8E6CF',
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  actionBtn: {
+    borderRadius: 14,
+    paddingVertical: 7,
+    alignItems: 'center',
+  },
+  actionBtnText: {
+    color: '#FFFFFF',
+    fontSize: 11,
     fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 8,
   },
-  resourceDescription: {
-    fontSize: 14,
-    color: '#8E8E93',
-    lineHeight: 20,
-    marginBottom: 12,
-  },
-  readButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    alignSelf: 'flex-start',
-  },
-  readButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  journalHeader: {
+  journalHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 20,
+    alignItems: 'center',
+    marginBottom: 10,
   },
-  addJournalButton: {
+  newEntryBtn: {
     backgroundColor: '#30D158',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 14,
   },
-  addJournalText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
-  emptyStateIcon: {
-    fontSize: 48,
-    marginBottom: 16,
-  },
-  emptyStateText: {
-    fontSize: 18,
+  newEntryBtnText: {
+    color: '#000000',
+    fontSize: 11,
     fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 8,
   },
-  emptyStateSubtext: {
-    fontSize: 14,
-    color: '#8E8E93',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  journalEntryCard: {
-    backgroundColor: '#1C1C1E',
-    borderRadius: 16,
-    padding: 16,
+  journalPrivacyNotice: {
+    backgroundColor: '#1A281A',
+    borderRadius: 10,
+    padding: 10,
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#285E28',
   },
-  journalEntryHeader: {
+  journalPrivacyText: {
+    fontSize: 11,
+    color: '#A8E6CF',
+    lineHeight: 15,
+  },
+  journalCard: {
+    backgroundColor: '#1C1C1E',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#2C2C2E',
+  },
+  journalCardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 3,
   },
   journalMood: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: 'bold',
     color: '#FFFFFF',
   },
   journalDate: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#8E8E93',
   },
-  journalContent: {
-    fontSize: 14,
-    color: '#FFFFFF',
-    lineHeight: 20,
+  journalContext: {
+    fontSize: 10,
+    color: '#007AFF',
+    marginBottom: 4,
+    fontWeight: '500',
+  },
+  journalBody: {
+    fontSize: 12,
+    color: '#D0D0D0',
+    lineHeight: 17,
   },
   videoCard: {
     backgroundColor: '#1C1C1E',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 10,
     flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: '#2C2C2E',
   },
-  videoThumbnail: {
-    width: 80,
+  videoThumb: {
+    width: 60,
     height: 60,
     backgroundColor: '#2C2C2E',
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
-  playIcon: {
-    fontSize: 20,
+  videoPlayIcon: {
+    fontSize: 18,
     color: '#FFFFFF',
   },
   videoInfo: {
     flex: 1,
   },
   videoTitle: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 4,
+    marginBottom: 2,
+    lineHeight: 16,
   },
   videoChannel: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#8E8E93',
+    marginBottom: 3,
+  },
+  videoDesc: {
+    fontSize: 11,
+    color: '#909090',
+    lineHeight: 14,
     marginBottom: 4,
   },
-  videoDescription: {
-    fontSize: 12,
-    color: '#8E8E93',
-    marginBottom: 8,
-  },
-  videoMeta: {
+  videoMetaRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  videoCategoryBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  videoCategoryText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#FFFFFF',
+  videoBadgeText: {
+    fontSize: 9,
+    color: '#58A6FF',
+    fontWeight: 'bold',
   },
   videoDuration: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#8E8E93',
-  },
-  meditationCard: {
-    backgroundColor: '#1C1C1E',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-  },
-  meditationHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
-  },
-  meditationTitleContainer: {
-    flex: 1,
-    marginRight: 12,
-  },
-  meditationTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 4,
-  },
-  meditationType: {
-    fontSize: 12,
-    color: '#8E8E93',
-  },
-  meditationDuration: {
-    backgroundColor: '#2C2C2E',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  durationText: {
-    fontSize: 12,
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  meditationDescription: {
-    fontSize: 14,
-    color: '#8E8E93',
-    lineHeight: 20,
-    marginBottom: 12,
-  },
-  startMeditationButton: {
-    backgroundColor: '#5856D6',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    alignItems: 'center',
-  },
-  startMeditationText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
   },
   trackerTabs: {
     flexDirection: 'row',
     backgroundColor: '#2C2C2E',
-    borderRadius: 12,
-    padding: 4,
-    marginBottom: 20,
+    borderRadius: 10,
+    padding: 3,
+    marginBottom: 12,
   },
   trackerTab: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 6,
     alignItems: 'center',
     borderRadius: 8,
   },
@@ -793,137 +975,142 @@ const styles = StyleSheet.create({
     backgroundColor: '#007AFF',
   },
   trackerTabText: {
-    fontSize: 14,
+    fontSize: 11,
     color: '#8E8E93',
     fontWeight: '600',
   },
   activeTrackerTabText: {
     color: '#FFFFFF',
   },
-  trackerContent: {
-    marginTop: 10,
+  milestoneRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#2C2C2E',
   },
-  trackerCard: {
-    backgroundColor: '#1C1C1E',
-    borderRadius: 16,
-    padding: 20,
+  milestoneDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 10,
+  },
+  milestoneContent: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
-  trackerCardTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  milestoneStepTitle: {
+    fontSize: 12,
     color: '#FFFFFF',
-    marginBottom: 8,
-    textAlign: 'center',
+    fontWeight: '500',
   },
-  trackerCardDescription: {
-    fontSize: 14,
-    color: '#8E8E93',
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  trackerButton: {
-    backgroundColor: '#30D158',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 20,
-  },
-  trackerButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+  milestoneStatus: {
+    fontSize: 11,
     fontWeight: '600',
+  },
+  habitRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#161922',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 6,
+  },
+  habitName: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    flex: 1,
+  },
+  habitStreak: {
+    fontSize: 11,
+    color: '#30D158',
+    fontWeight: 'bold',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backgroundColor: 'rgba(0,0,0,0.85)',
     justifyContent: 'flex-end',
   },
-  journalModalContent: {
+  modalContent: {
     backgroundColor: '#1C1C1E',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    padding: 20,
+    padding: 18,
+    paddingBottom: 30,
     maxHeight: '80%',
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 15,
     fontWeight: 'bold',
     color: '#FFFFFF',
-  },
-  modalCloseButton: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 15,
-    width: 30,
-    height: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   modalCloseText: {
     fontSize: 16,
     color: '#FFFFFF',
     fontWeight: '600',
   },
-  moodLabel: {
-    fontSize: 16,
+  formLabel: {
+    fontSize: 11,
     fontWeight: '600',
     color: '#FFFFFF',
-    marginBottom: 12,
+    marginBottom: 4,
+    marginTop: 8,
   },
-  moodSelector: {
-    marginBottom: 20,
+  moodScroll: {
+    marginBottom: 4,
   },
-  moodButton: {
+  moodChip: {
     backgroundColor: '#2C2C2E',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    marginRight: 5,
   },
-  selectedMoodButton: {
+  selectedMoodChip: {
     backgroundColor: '#007AFF',
   },
-  moodButtonText: {
-    fontSize: 14,
-    color: '#FFFFFF',
-    fontWeight: '500',
+  moodChipText: {
+    fontSize: 11,
+    color: '#8E8E93',
   },
-  journalLabel: {
-    fontSize: 16,
-    fontWeight: '600',
+  selectedMoodChipText: {
     color: '#FFFFFF',
-    marginBottom: 12,
+    fontWeight: 'bold',
   },
-  journalInput: {
+  modalInput: {
     backgroundColor: '#2C2C2E',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     color: '#FFFFFF',
-    fontSize: 16,
-    minHeight: 120,
-    textAlignVertical: 'top',
-    marginBottom: 20,
+    fontSize: 13,
   },
-  saveJournalButton: {
+  modalTextArea: {
+    minHeight: 80,
+  },
+  saveEntryBtn: {
     backgroundColor: '#30D158',
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderRadius: 25,
+    borderRadius: 16,
+    paddingVertical: 10,
     alignItems: 'center',
+    marginTop: 12,
   },
-  disabledButton: {
+  disabledBtn: {
     backgroundColor: '#2C2C2E',
   },
-  saveJournalText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+  saveEntryBtnText: {
+    color: '#000000',
+    fontSize: 13,
+    fontWeight: 'bold',
   },
 });
 

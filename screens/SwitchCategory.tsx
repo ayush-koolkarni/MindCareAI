@@ -1,4 +1,4 @@
-//SwitchCategory.tsx
+// SwitchCategory.tsx
 import React, { useState } from 'react';
 import {
   View,
@@ -22,139 +22,107 @@ interface Category {
 
 const categories: Category[] = [
   {
+    id: '0',
+    name: 'Default - General Trauma & Crisis Support',
+    hashtag: '#ElevanaCare',
+    icon: '🌟',
+    color: '#007AFF',
+    description: 'Comprehensive emotional support, crisis de-escalation & general guidance'
+  },
+  {
     id: '1',
-    name: 'Exam Stress',
-    hashtag: '#ExamStress',
-    icon: '📚',
-    color: '#FF6B6B',
-    description: 'Academic pressure and test anxiety support'
+    name: 'Sexual Violence & Assault Recovery',
+    hashtag: '#SurvivorsCare',
+    icon: '💜',
+    color: '#9B59B6',
+    description: 'Specialized trauma-informed healing, medical aid & legal protections'
   },
   {
     id: '2',
-    name: 'Relationship Issues',
-    hashtag: '#RelationshipIssues',
-    icon: '💔',
-    color: '#4ECDC4',
-    description: 'Dating, friendships, and family conflicts'
+    name: 'Domestic Abuse & Family Harassment',
+    hashtag: '#SafetyFirst',
+    icon: '🛡️',
+    color: '#E74C3C',
+    description: 'Safety planning, emergency protection orders & emotional sanctuary'
   },
   {
     id: '3',
-    name: 'Social Anxiety',
-    hashtag: '#SocialAnxiety',
-    icon: '😰',
-    color: '#45B7D1',
-    description: 'Fear of social situations and interactions'
+    name: 'Threat & Active Witness Intimidation',
+    hashtag: '#WitnessProtection',
+    icon: '🚨',
+    color: '#FF9500',
+    description: 'Immediate police escort requests, safety protocols & threat de-escalation'
   },
   {
     id: '4',
-    name: 'Career Confusion',
-    hashtag: '#CareerConfusion',
-    icon: '🤔',
-    color: '#96CEB4',
-    description: 'Uncertainty about future and career choices'
+    name: 'Court Trial & Legal Anxiety',
+    hashtag: '#TrialAnxiety',
+    icon: '🏛️',
+    color: '#3498DB',
+    description: 'Coping with cross-examinations, testimony stress & DLSA legal aid'
   },
   {
     id: '5',
-    name: 'Financial Stress',
-    hashtag: '#FinancialStress',
-    icon: '💸',
-    color: '#FECA57',
-    description: 'Money worries and financial planning'
+    name: 'SC/ST Atrocity Victim Support',
+    hashtag: '#SCSTPoAAct',
+    icon: '⚖️',
+    color: '#4A90E2',
+    description: 'Dedicated assistance under Scheduled Castes & Scheduled Tribes Act 1989'
   },
   {
     id: '6',
-    name: 'Body Image',
-    hashtag: '#BodyImage',
-    icon: '🪞',
-    color: '#FF9FF3',
-    description: 'Self-image and appearance concerns'
+    name: 'Violent Incident & Physical Trauma',
+    hashtag: '#TraumaHealing',
+    icon: '🩹',
+    color: '#1ABC9C',
+    description: 'Psychological recovery from assault, grievous hurt, and arson'
   },
   {
     id: '7',
-    name: 'Sleep Issues',
-    hashtag: '#SleepIssues',
-    icon: '😴',
-    color: '#54A0FF',
-    description: 'Insomnia and sleep schedule problems'
+    name: 'Police Complaint & FIR Registration',
+    hashtag: '#FIRSupport',
+    icon: '🚔',
+    color: '#5856D6',
+    description: 'Support during zero-FIR filing, investigation follow-up & police visits'
   },
   {
     id: '8',
-    name: 'Family Pressure',
-    hashtag: '#FamilyPressure',
-    icon: '👨‍👩‍👧‍👦',
-    color: '#5F27CD',
-    description: 'Family expectations and conflicts'
+    name: 'Social Boycott & Hate Crimes',
+    hashtag: '#AntiDiscrimination',
+    icon: '🤝',
+    color: '#2ECC71',
+    description: 'Overcoming social ostracism, discrimination & restoring dignity'
   },
   {
     id: '9',
-    name: 'FOMO',
-    hashtag: '#FOMO',
-    icon: '📱',
-    color: '#00D2D3',
-    description: 'Fear of missing out and social comparison'
+    name: 'Compensation & Welfare Entitlements',
+    hashtag: '#RehabilitationAid',
+    icon: '📑',
+    color: '#F1C40F',
+    description: 'Guidance on government compensation, statutory relief & rehabilitation'
   },
   {
     id: '10',
-    name: 'Procrastination',
-    hashtag: '#Procrastination',
-    icon: '⏰',
-    color: '#FF7675',
-    description: 'Time management and motivation issues'
+    name: 'Economic Hardship & Displacement',
+    hashtag: '#LivelihoodRelief',
+    icon: '🌾',
+    color: '#D35400',
+    description: 'Financial recovery assistance and livelihood restoration after trauma'
   },
   {
     id: '11',
-    name: 'Identity Crisis',
-    hashtag: '#IdentityCrisis',
-    icon: '🎭',
-    color: '#A29BFE',
-    description: 'Self-discovery and identity confusion'
-  },
-  {
-    id: '12',
-    name: 'Loneliness',
-    hashtag: '#Loneliness',
-    icon: '😔',
-    color: '#6C5CE7',
-    description: 'Feeling isolated and disconnected'
-  },
-  {
-    id: '13',
-    name: 'Perfectionism',
-    hashtag: '#Perfectionism',
-    icon: '🎯',
-    color: '#FD79A8',
-    description: 'Unrealistic standards and self-criticism'
-  },
-  {
-    id: '14',
-    name: 'Peer Pressure',
-    hashtag: '#PeerPressure',
-    icon: '👫',
-    color: '#FDCB6E',
-    description: 'Social influence and conformity stress'
-  },
-  {
-    id: '15',
-    name: 'Time Management',
-    hashtag: '#TimeManagement',
-    icon: '⌚',
-    color: '#E17055',
-    description: 'Balancing studies, work, and personal life'
-  },
-  {
-    id: '16',
-    name: 'General Support',
-    hashtag: '#GeneralSupport',
-    icon: '🤗',
-    color: '#00B894',
-    description: 'Overall mental wellness and support'
+    name: 'Psychological & Suicidal Crisis',
+    hashtag: '#EmergencyIntervention',
+    icon: '🆘',
+    color: '#C0392B',
+    description: 'Immediate 24/7 crisis de-escalation, suicide prevention & psychiatric aid'
   },
 ];
 
 const SwitchCategory: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { currentCategory } = (route.params as any) || { currentCategory: 'General Support' };
+  const { currentCategory } = (route.params as any) || { currentCategory: 'Default - General Trauma & Crisis Support' };
   
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [scaleAnimations] = useState(
@@ -170,7 +138,7 @@ const SwitchCategory: React.FC = () => {
     // Scale animation
     Animated.sequence([
       Animated.timing(scaleAnimations[category.id], {
-        toValue: 0.95,
+        toValue: 0.96,
         duration: 100,
         useNativeDriver: true,
       }),
@@ -183,10 +151,10 @@ const SwitchCategory: React.FC = () => {
 
     // Navigate back with the selected category
     setTimeout(() => {
-      navigation.navigate('Main' as never, { 
+      (navigation as any).navigate('Main', { 
         selectedCategory: category.name 
-        } as never);
-    }, 500);
+      });
+    }, 400);
   };
 
   return (
@@ -200,17 +168,17 @@ const SwitchCategory: React.FC = () => {
         </TouchableOpacity>
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerTitle}>Switch Category</Text>
-          <Text style={styles.headerSubtitle}>Choose your support focus</Text>
+          <Text style={styles.headerSubtitle}>Choose support context & AI focus</Text>
         </View>
         <View style={styles.placeholder} />
       </View>
 
       <View style={styles.instructionContainer}>
         <Text style={styles.instructionText}>
-          Current: <Text style={styles.currentCategoryText}>{currentCategory}</Text>
+          Active: <Text style={styles.currentCategoryText}>{currentCategory}</Text>
         </Text>
         <Text style={styles.instructionSubText}>
-          Select a category to start a fresh conversation tailored to your specific needs
+          Select any category to tailor the AI guidance, resources, and clinical recommendations
         </Text>
       </View>
 
@@ -264,12 +232,6 @@ const SwitchCategory: React.FC = () => {
           ))}
         </View>
       </ScrollView>
-
-      <View style={styles.bottomSection}>
-        <Text style={styles.bottomText}>
-          💡 Tip: Each category provides specialized support and resources
-        </Text>
-      </View>
     </SafeAreaView>
   );
 };
@@ -283,23 +245,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: '#1C1C1E',
     borderBottomWidth: 1,
-    borderBottomColor: '#38383A',
+    borderBottomColor: '#2C2C2E',
   },
   backButton: {
     backgroundColor: '#2C2C2E',
-    borderRadius: 20,
-    padding: 10,
-    width: 40,
-    height: 40,
+    borderRadius: 18,
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
   backButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#FFFFFF',
     fontWeight: '600',
   },
@@ -308,140 +269,120 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
   headerSubtitle: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#8E8E93',
-    marginTop: 2,
+    marginTop: 1,
   },
   placeholder: {
-    width: 40,
+    width: 36,
   },
   instructionContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: '#1C1C1E',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: '#141416',
+    borderBottomWidth: 1,
+    borderBottomColor: '#2C2C2E',
   },
   instructionText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#8E8E93',
     textAlign: 'center',
-    marginBottom: 5,
+    marginBottom: 2,
   },
   currentCategoryText: {
     color: '#007AFF',
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   instructionSubText: {
-    fontSize: 12,
-    color: '#8E8E93',
+    fontSize: 11,
+    color: '#6E6E73',
     textAlign: 'center',
-    lineHeight: 16,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
-    paddingBottom: 100,
+    padding: 14,
+    paddingBottom: 40,
   },
   categoriesGrid: {
-    gap: 12,
+    gap: 10,
   },
   categoryCardContainer: {
-    marginBottom: 4,
+    marginBottom: 2,
   },
   categoryCard: {
     backgroundColor: '#1C1C1E',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 14,
+    padding: 14,
     borderLeftWidth: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#2C2C2E',
   },
   selectedCard: {
-    backgroundColor: '#2C2C2E',
-    shadowColor: '#007AFF',
-    shadowOpacity: 0.5,
-    elevation: 5,
+    backgroundColor: '#242A36',
+    borderColor: '#007AFF',
   },
   currentCard: {
-    backgroundColor: '#1A1A2E',
-    borderLeftWidth: 6,
+    backgroundColor: '#161B26',
+    borderLeftWidth: 5,
   },
   categoryHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   categoryIcon: {
-    fontSize: 24,
-    marginRight: 12,
+    fontSize: 20,
+    marginRight: 10,
   },
   categoryTitleContainer: {
     flex: 1,
   },
   categoryName: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 2,
   },
   categoryHashtag: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
+    marginTop: 1,
   },
   currentBadge: {
     backgroundColor: '#007AFF',
     color: '#FFFFFF',
     fontSize: 10,
-    fontWeight: '600',
-    paddingHorizontal: 8,
+    fontWeight: 'bold',
+    paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 8,
+    borderRadius: 6,
     overflow: 'hidden',
   },
   categoryDescription: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#8E8E93',
-    lineHeight: 20,
-    marginLeft: 36,
+    lineHeight: 17,
+    marginLeft: 30,
+    marginTop: 2,
   },
   selectedIndicator: {
     alignSelf: 'flex-end',
     backgroundColor: '#007AFF',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginTop: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 10,
+    marginTop: 6,
   },
   selectedText: {
     color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  bottomSection: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#1C1C1E',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderTopWidth: 1,
-    borderTopColor: '#38383A',
-  },
-  bottomText: {
-    fontSize: 14,
-    color: '#8E8E93',
-    textAlign: 'center',
-    fontStyle: 'italic',
+    fontSize: 11,
+    fontWeight: 'bold',
   },
 });
 

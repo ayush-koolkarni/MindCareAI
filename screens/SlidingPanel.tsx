@@ -1,4 +1,4 @@
-//SlidingPanel.tsx
+// SlidingPanel.tsx
 import React from 'react';
 import {
   Animated,
@@ -23,40 +23,48 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({
   children, 
   onNavigate 
 }) => {
-  const handlePress = (label: string) => {
-    console.log(`${label} clicked`);
-    
-    switch (label) {
+  const handlePress = (target: string) => {
+    switch (target) {
+      case 'ResourceLibrary':
       case 'Resource Library':
         onNavigate('ResourceLibrary');
         break;
+      case 'SwitchCategory':
       case 'Switch Category':
         onNavigate('SwitchCategory');
         break;
+      case 'PeerSupport':
+      case 'Victim Support Circle':
       case 'Peer Support Guidance':
         onNavigate('PeerSupport');
         break;
+      case 'MentalHealthTests':
+      case 'Mental Health Assessment':
       case 'Mental Health Tests':
         onNavigate('MentalHealthTests');
         break;
+      case 'ProfessionalCare':
+      case 'Professional Support':
       case 'Professional Care':
         onNavigate('ProfessionalCare');
         break;
+      case 'SuccessNetwork':
       case 'Success Network':
         onNavigate('SuccessNetwork');
         break;
       default:
-        console.log(`${label} - no navigation defined`);
+        console.log(`${target} - default navigate`);
+        onNavigate(target);
     }
   };
 
   const menuItems = [
-    { label: 'Switch Category', icon: '🔄', description: 'Change support category' },
-    { label: 'Peer Support Guidance', icon: '👥', description: 'Connect with peers' },
-    { label: 'Resource Library', icon: '📚', description: 'Browse helpful resources' },
-    { label: 'Mental Health Tests', icon: '📊', description: 'Self-assessment tools' },
-    { label: 'Professional Care', icon: '🏥', description: 'Find professional help' },
-    { label: 'Success Network', icon: '⭐', description: 'Success stories & tips' },
+    { target: 'SwitchCategory', label: 'Switch Category', icon: '🔄', description: 'Change support context & AI focus' },
+    { target: 'PeerSupport', label: 'Victim Support Circle', icon: '👥', description: 'Anonymous community & audio stories' },
+    { target: 'ResourceLibrary', label: 'Resource Library', icon: '📚', description: 'Rights, legal aid & trauma recovery' },
+    { target: 'MentalHealthTests', label: 'Mental Health Assessment', icon: '📊', description: 'DASS-21, PHQ-9 & clinical scales' },
+    { target: 'ProfessionalCare', label: 'Professional Support', icon: '🏥', description: 'Police FIR & counselor booking' },
+    { target: 'SuccessNetwork', label: 'Success Network', icon: '⭐', description: 'Justice milestones & survivor journeys' },
   ];
 
   return (
@@ -72,8 +80,14 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({
 
       <View style={styles.content}>
         <View style={styles.headerSection}>
-          <Text style={styles.headerText}>Navigator</Text>
-          <Text style={styles.headerSubtext}>Mental Health Support Hub</Text>
+          <View style={styles.brandingRow}>
+            <Text style={styles.headerLogo}>🛡️</Text>
+            <Text style={styles.headerText}>Elevana AI</Text>
+          </View>
+          <Text style={styles.headerSubtext}>Dynamic Distress Monitoring & Victim Support</Text>
+          <View style={styles.nhaaBadge}>
+            <Text style={styles.nhaaBadgeText}>Integrated with NHAA (14566)</Text>
+          </View>
         </View>
 
         <ScrollView 
@@ -87,7 +101,7 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({
               <TouchableOpacity
                 key={index}
                 style={styles.button}
-                onPress={() => handlePress(item.label)}
+                onPress={() => handlePress(item.target)}
                 activeOpacity={0.8}
               >
                 <View style={styles.buttonContent}>
@@ -103,8 +117,9 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({
           </View>
 
           <View style={styles.footerSection}>
-            <Text style={styles.footerText}>MindCare AI v1.0</Text>
-            <Text style={styles.footerSubtext}>Your mental wellness companion</Text>
+            <Text style={styles.footerText}>Elevana AI v2.0</Text>
+            <Text style={styles.footerSubtext}>National Mental Health & Atrocity Relief Network</Text>
+            <Text style={styles.privacyGuarantee}>🔒 RoBERTa PII Anonymization Active</Text>
           </View>
         </ScrollView>
       </View>
@@ -125,26 +140,52 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 12,
     zIndex: 1000,
-    paddingTop: 60,
+    paddingTop: 50,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingHorizontal: 16,
+    paddingTop: 10,
   },
   headerSection: {
-    marginBottom: 20,
+    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2C2C2E',
+    paddingBottom: 14,
   },
-  headerText: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
+  brandingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 4,
   },
+  headerLogo: {
+    fontSize: 22,
+    marginRight: 8,
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
   headerSubtext: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#8E8E93',
     fontWeight: '500',
+    marginBottom: 8,
+  },
+  nhaaBadge: {
+    backgroundColor: '#1A2E1A',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: '#285E28',
+  },
+  nhaaBadgeText: {
+    fontSize: 10,
+    color: '#30D158',
+    fontWeight: 'bold',
   },
   scrollContainer: {
     flex: 1,
@@ -153,64 +194,68 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   buttonsContainer: {
-    gap: 12,
-    marginBottom: 30,
+    gap: 10,
+    marginBottom: 20,
   },
   button: {
     backgroundColor: '#2C2C2E',
-    borderRadius: 16,
+    borderRadius: 14,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#38383A',
   },
   buttonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: 12,
   },
   buttonIcon: {
-    fontSize: 20,
-    marginRight: 12,
-    width: 24,
+    fontSize: 18,
+    marginRight: 10,
+    width: 22,
   },
   buttonTextContainer: {
     flex: 1,
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: 'bold',
     marginBottom: 2,
   },
   buttonDescription: {
     color: '#8E8E93',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '400',
   },
   arrowIcon: {
     color: '#8E8E93',
-    fontSize: 16,
-    marginLeft: 8,
+    fontSize: 14,
+    marginLeft: 6,
   },
   footerSection: {
     alignItems: 'center',
-    paddingTop: 20,
+    paddingTop: 16,
     paddingBottom: 20,
     borderTopWidth: 1,
-    borderTopColor: '#38383A',
+    borderTopColor: '#2C2C2E',
   },
   footerText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: 'bold',
     color: '#007AFF',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   footerSubtext: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#8E8E93',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  privacyGuarantee: {
+    fontSize: 10,
+    color: '#30D158',
+    fontWeight: '600',
   },
 });
 

@@ -1,4 +1,4 @@
-//App.tsx
+// App.tsx
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -10,12 +10,20 @@ import Screen4 from './MentalHealthTests';
 import Screen5 from './ProfessionalCare';
 import Screen6 from './SuccessNetwork';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<any>();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Main">
+      <Stack.Navigator
+        id="RootStack"
+        initialRouteName="Main"
+        screenOptions={{
+          headerStyle: { backgroundColor: '#1C1C1E' },
+          headerTintColor: '#FFFFFF',
+          headerTitleStyle: { fontWeight: 'bold' },
+        }}
+      >
         <Stack.Screen 
           name="Main" 
           component={MainScreen} 
@@ -29,7 +37,7 @@ export default function App() {
         <Stack.Screen 
           name="PeerSupport" 
           component={Screen2} 
-          options={{ title: 'Peer Support' }}
+          options={{ title: 'Victim Support Circle' }}
         />
         <Stack.Screen 
           name="SwitchCategory" 
@@ -39,12 +47,12 @@ export default function App() {
         <Stack.Screen 
           name="MentalHealthTests" 
           component={Screen4} 
-          options={{ title: 'Mental Health Tests' }}
+          options={{ title: 'Mental Health Assessment' }}
         />
         <Stack.Screen 
           name="ProfessionalCare" 
           component={Screen5} 
-          options={{ title: 'Professional Care' }}
+          options={{ title: 'Professional Support' }}
         />
         <Stack.Screen 
           name="SuccessNetwork" 

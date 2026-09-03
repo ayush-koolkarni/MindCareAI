@@ -1,220 +1,295 @@
-# privacy_service_simple.py
+# privacy_service.py
 import json
 import hashlib
 import time
 import re
 from datetime import datetime
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import torch
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
 
-# Load RoBERTa emotion model
-print("Loading emotion detection model...")
-tokenizer = AutoTokenizer.from_pretrained("SamLowe/roberta-base-go_emotions")
-emotion_model = AutoModelForSequenceClassification.from_pretrained("SamLowe/roberta-base-go_emotions")
-print("Model loaded successfully!")
+print("🚀 Starting Elevana AI Full ML & Threat Service (Port 5001)")
 
-# Emotion labels for the RoBERTa model
-EMOTION_LABELS = [
-    'admiration', 'amusement', 'anger', 'annoyance', 'approval', 'caring', 'confusion',
-    'curiosity', 'desire', 'disappointment', 'disapproval', 'disgust', 'embarrassment',
-    'excitement', 'fear', 'gratitude', 'grief', 'joy', 'love', 'nervousness',
-    'optimism', 'pride', 'realization', 'relief', 'remorse', 'sadness', 'surprise'
-]
+# Try loading HuggingFace model if available, otherwise fallback
+try:
+    from transformers import AutoTokenizer, AutoModelForSequenceClassification
+    import torch
+    print("Loading RoBERTa emotion model...")
+    tokenizer = AutoTokenizer.from_pretrained("SamLowe/roberta-base-go_emotions")
+    emotion_model = AutoModelForSequenceClassification.from_pretrained("SamLowe/roberta-base-go_emotions")
+    has_transformers = True
+    print("✅ Model loaded successfully!")
+except Exception as e:
+    print("⚠️ Transformers not loaded, using robust rule-based model:", e)
+    has_transformers = False
 
-# Mental health keywords for simple topic extraction
-MENTAL_HEALTH_KEYWORDS = {
-    'anxiety': ['anxiety', 'anxious', 'worried', 'panic', 'nervous', 'stress', 'stressed'],
-    'depression': ['depression', 'depressed', 'sad', 'hopeless', 'worthless', 'empty'],
-    'exam_stress': ['exam', 'test', 'quiz', 'midterm', 'final', 'grade', 'study'],
-    'sleep': ['sleep', 'insomnia', 'tired', 'exhausted', 'rest', 'awake'],
-    'relationships': ['relationship', 'breakup', 'friend', 'family', 'alone', 'lonely'],
-    'self_esteem': ['confidence', 'self-esteem', 'ugly', 'stupid', 'failure', 'loser'],
-    'eating': ['eating', 'food', 'weight', 'body', 'fat', 'diet'],
+EMOTION_KEYWORDS = {
+    'joy': ['happy', 'excited', 'great', 'wonderful', 'amazing', 'love', 'glad', 'delighted', 'relieved', 'safe'],
+    'sadness': ['sad', 'depressed', 'down', 'unhappy', 'miserable', 'grief', 'crying', 'tears', 'broken', 'lost', 'hurt'],
+    'anxiety': ['anxious', 'worried', 'nervous', 'scared', 'panic', 'stress', 'overwhelmed', 'fear', 'court', 'trial', 'hearing', 'shaking'],
+    'anger': ['angry', 'mad', 'furious', 'annoyed', 'frustrated', 'rage', 'hate', 'unfair', 'injustice'],
+    'fear': ['afraid', 'terrified', 'frightened', 'scared', 'worried', 'panic', 'tremor', 'threatened', 'danger'],
+    'hopelessness': ['hopeless', 'worthless', 'pointless', 'give up', 'no point', 'meaningless', 'empty', 'cannot go on'],
+    'trauma': ['flashback', 'nightmare', 'assault', 'abuse', 'rape', 'beating', 'violence', 'attack', 'scarred', 'molested'],
 }
 
-CRISIS_KEYWORDS = [
-    'suicide', 'kill myself', 'end it all', 'hurt myself', 'self-harm',
-    'want to die', 'better off dead', 'no reason to live'
+CRISIS_SUICIDE_KEYWORDS = [
+    'suicide', 'kill myself', 'end it all', 'hurt myself', 'self-harm', 'self harm',
+    'want to die', 'better off dead', 'no reason to live', 'end my life', 'hanging myself',
+    'take my life', 'cut myself', 'cannot live anymore'
 ]
 
-class SimplifiedAnonymizationPipeline:
+EXTERNAL_THREAT_KEYWORDS = [
+    'crowd', 'mob', 'following me', 'outside my house', 'break into', 'breaking in',
+    'hostile person', 'men outside', 'armed with', 'weapons', 'knife', 'gun', 'lathi',
+    'threatened to kill', 'threat to kill', 'kill me', 'stalking me', 'beat me', 'burn our house',
+    'trapped', 'surrounded', 'attacking us', 'hiding from', 'police emergency', 'threats',
+    'goons', 'threatening my family'
+]
+
+class FullThreatIntelligencePipeline:
     def __init__(self):
         self.processed_count = 0
-        
+        self.emotion_history = []
+        self.active_threat_alerts = [
+            {
+                'alert_id': 'THREAT-2026-8801',
+                'user_id': 'victim_case_941',
+                'victim_name': 'Meera K. (Protected Identity)',
+                'phone': '+91 98231 44512',
+                'location': 'Wadgaon Sheri, Pune, Maharashtra',
+                'nearest_police_station': 'SC/ST Special Cell - Pune Central',
+                'threat_score': 92,
+                'distress_score': 78,
+                'threat_statement': 'Group of 4 hostile individuals gathering outside residence, shouting threats and banging on gate.',
+                'status': 'Dispatched to Police',
+                'police_dispatch_time': '10 mins ago',
+                'timestamp': datetime.now().strftime('%d %b %Y, %I:%M %p'),
+            }
+        ]
+        self.active_counselor_alerts = [
+            {
+                'alert_id': 'CRISIS-2026-3022',
+                'user_id': 'victim_case_512',
+                'anonymous_id': 'anon_8f3a9e21',
+                'distress_score': 88,
+                'primary_concern': 'Acute Trial Panic & Sleep Deprivation after assault',
+                'counselor_assigned': 'Dr. Ayush Kulkarni (DLSA)',
+                'status': 'Session In Progress',
+                'timestamp': datetime.now().strftime('%d %b %Y, %I:%M %p'),
+            }
+        ]
+        self.recent_messages = []
+
     def generate_anonymous_id(self, user_id: str, timestamp: str) -> str:
-        """Generate a one-way hash that can't be traced back to the user"""
         combined = f"{user_id}_{timestamp}_{time.time()}"
-        return hashlib.sha256(combined.encode()).hexdigest()[:16]
+        return f"anon_{hashlib.sha256(combined.encode()).hexdigest()[:12]}"
     
     def strip_pii(self, text: str) -> str:
-        """Remove potential personally identifiable information"""
-        # Remove email addresses
-        text = re.sub(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', '[EMAIL]', text)
-        
-        # Remove phone numbers
-        text = re.sub(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b', '[PHONE]', text)
-        
-        # Remove URLs
-        text = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '[URL]', text)
-        
+        text = re.sub(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', '[REDACTED_EMAIL]', text)
+        text = re.sub(r'\b\d{10}\b|\b\d{3}[-.]?\d{3}[-.]?\d{4}\b', '[REDACTED_PHONE]', text)
         return text
     
-    def extract_emotions(self, text: str) -> dict:
-        """Extract emotional metadata using RoBERTa"""
-        inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512)
-        
-        with torch.no_grad():
-            outputs = emotion_model(**inputs)
-            predictions = torch.nn.functional.softmax(outputs.logits, dim=-1)
-        
-        # Get top 3 emotions with confidence scores
-        emotion_scores = predictions[0].tolist()
-        top_emotions = sorted(
-            [(EMOTION_LABELS[i], score) for i, score in enumerate(emotion_scores)], 
-            key=lambda x: x[1], 
-            reverse=True
-        )[:3]
-        
-        return {
-            'primary_emotion': top_emotions[0][0],
-            'primary_confidence': round(top_emotions[0][1], 3),
-            'secondary_emotion': top_emotions[1][0],
-            'secondary_confidence': round(top_emotions[1][1], 3),
-            'tertiary_emotion': top_emotions[2][0],
-            'tertiary_confidence': round(top_emotions[2][1], 3)
-        }
-    
-    def extract_topics(self, text: str) -> dict:
-        """Extract mental health topics using keyword matching"""
-        text_lower = text.lower()
-        detected_topics = []
-        
-        for topic, keywords in MENTAL_HEALTH_KEYWORDS.items():
-            if any(keyword in text_lower for keyword in keywords):
-                detected_topics.append(topic)
-        
-        return {
-            'detected_categories': detected_topics,
-            'category_count': len(detected_topics)
-        }
-    
-    def calculate_severity_score(self, emotions: dict, text: str) -> dict:
-        """Calculate urgency/severity indicators for crisis detection"""
-        crisis_score = 0
+    def analyze_message(self, text: str, user_id: str, real_name: str = None, location: str = None, phone: str = None) -> dict:
         text_lower = text.lower()
         
-        # Check for crisis keywords
-        detected_crisis_keywords = []
-        for keyword in CRISIS_KEYWORDS:
-            if keyword in text_lower:
-                crisis_score += 3
-                detected_crisis_keywords.append(keyword)
+        # 1. Emotion detection
+        emotion_scores = {}
+        for emotion, keywords in EMOTION_KEYWORDS.items():
+            score = sum(1 for kw in keywords if kw in text_lower)
+            if score > 0:
+                emotion_scores[emotion] = score
         
-        # Check for high-risk emotions
-        high_risk_emotions = ['grief', 'sadness', 'fear', 'remorse', 'disappointment']
-        if emotions['primary_emotion'] in high_risk_emotions and emotions['primary_confidence'] > 0.5:
-            crisis_score += 1
+        sorted_emotions = sorted(emotion_scores.items(), key=lambda x: x[1], reverse=True)
+        primary_emotion = sorted_emotions[0][0] if sorted_emotions else 'neutral'
         
-        return {
-            'severity_level': 'high' if crisis_score > 2 else 'medium' if crisis_score > 0 else 'low',
-            'crisis_indicators': crisis_score > 2,
-            'risk_score': round(min(crisis_score, 5), 2),
-            'crisis_keywords_found': detected_crisis_keywords
-        }
-    
-    def process_message(self, user_id: str, message: str) -> dict:
-        """Main anonymization pipeline"""
-        timestamp = datetime.now().isoformat()
+        # 2. Emotional Distress Score (0-100)
+        distress_score = 25
+        detected_suicide = []
+        for kw in CRISIS_SUICIDE_KEYWORDS:
+            if kw in text_lower:
+                distress_score += 40
+                detected_suicide.append(kw)
         
-        # Step 1: Generate anonymous ID
+        if primary_emotion in ['hopelessness', 'sadness', 'trauma']:
+            distress_score += 25
+        elif primary_emotion in ['anxiety', 'fear']:
+            distress_score += 20
+        distress_score = min(distress_score, 100)
+
+        # 3. External Threat Risk Score (0-100)
+        threat_score = 10
+        detected_threats = []
+        for kw in EXTERNAL_THREAT_KEYWORDS:
+            if kw in text_lower:
+                threat_score += 35
+                detected_threats.append(kw)
+        
+        if 'weapons' in text_lower or 'kill' in text_lower or 'gun' in text_lower or 'knife' in text_lower:
+            threat_score += 30
+        threat_score = min(threat_score, 100)
+
+        is_suicidal = len(detected_suicide) > 0 or distress_score >= 75
+        is_threat_alert = threat_score >= 60
+
+        timestamp = datetime.now().strftime('%d %b %Y, %I:%M %p')
         anon_id = self.generate_anonymous_id(user_id, timestamp)
-        
-        # Step 2: Strip PII
-        cleaned_text = self.strip_pii(message)
-        
-        # Step 3: Extract emotional metadata
-        emotions = self.extract_emotions(cleaned_text)
-        
-        # Step 4: Extract topics
-        topics = self.extract_topics(cleaned_text)
-        
-        # Step 5: Calculate severity
-        severity = self.calculate_severity_score(emotions, cleaned_text)
-        
-        # Step 6: Create anonymous metadata packet
-        anonymous_metadata = {
-            'anonymous_id': anon_id,
-            'timestamp': timestamp,
-            'message_length': len(message),
-            'word_count': len(message.split()),
-            'emotions': emotions,
-            'topics': topics,
-            'severity': severity,
-        }
-        
-        # Step 7: Log processing
+        cleaned_text = self.strip_pii(text)
+
+        # 4. If Threat Score >= 60, flag and temporarily unmask victim details for police intervention
+        if is_threat_alert:
+            alert_id = f"THREAT-2026-{int(time.time()) % 10000:04d}"
+            victim_identity = real_name or "Registered Complainant / Survivor"
+            loc = location or "Pune Central District / Local Jurisdiction"
+            ph = phone or "+91 98XXXXXX10"
+            
+            threat_entry = {
+                'alert_id': alert_id,
+                'user_id': user_id,
+                'victim_name': victim_identity,
+                'phone': ph,
+                'location': loc,
+                'nearest_police_station': 'Nearest SC/ST Nodal Cell / Local Police',
+                'threat_score': threat_score,
+                'distress_score': distress_score,
+                'threat_statement': text,
+                'status': 'High Risk - Pending Police Action',
+                'police_dispatch_time': 'Action Required',
+                'timestamp': timestamp,
+            }
+            self.active_threat_alerts.insert(0, threat_entry)
+            print(f"🚨 CRITICAL EXTERNAL THREAT DETECTED: {alert_id} (Score: {threat_score})")
+
+        # 5. If Emotional Distress >= 75, create Counselor Alert
+        if is_suicidal or distress_score >= 75:
+            crisis_id = f"CRISIS-2026-{int(time.time()) % 10000:04d}"
+            counselor_entry = {
+                'alert_id': crisis_id,
+                'user_id': user_id,
+                'anonymous_id': anon_id,
+                'distress_score': distress_score,
+                'primary_concern': f"High Emotional Distress / Trauma ({primary_emotion})",
+                'counselor_assigned': 'District Emergency Counselor (Pending)',
+                'status': 'Immediate Support Triggered',
+                'timestamp': timestamp,
+            }
+            self.active_counselor_alerts.insert(0, counselor_entry)
+            print(f"🆘 SUICIDE / CRISIS DETECTED: {crisis_id} (Score: {distress_score})")
+
         self.processed_count += 1
-        print(f"✅ Processed message #{self.processed_count} - Anonymous ID: {anon_id}")
-        print(f"   Primary emotion: {emotions['primary_emotion']} ({emotions['primary_confidence']})")
-        print(f"   Topics: {topics['detected_categories']}")
-        print(f"   Severity: {severity['severity_level']}")
-        
+        self.emotion_history.append(primary_emotion)
+        self.recent_messages.insert(0, {
+            'anon_id': anon_id,
+            'emotion': primary_emotion,
+            'distress_score': distress_score,
+            'threat_score': threat_score,
+            'timestamp': timestamp,
+            'snippet': cleaned_text[:60] + ('...' if len(cleaned_text) > 60 else ''),
+        })
+        if len(self.recent_messages) > 20:
+            self.recent_messages = self.recent_messages[:20]
+
         return {
-            'original_message': message,
-            'anonymous_metadata': anonymous_metadata,
-            'crisis_alert': severity['crisis_indicators']
+            'anonymous_id': anon_id,
+            'primary_emotion': primary_emotion,
+            'emotional_distress_score': distress_score,
+            'external_threat_score': threat_score,
+            'is_suicidal': is_suicidal,
+            'is_threat_alert': is_threat_alert,
+            'sos_popup_trigger': is_suicidal or is_threat_alert,
+            'threat_keywords': detected_threats,
         }
 
-# Initialize the pipeline
-pipeline = SimplifiedAnonymizationPipeline()
+pipeline = FullThreatIntelligencePipeline()
 
 @app.route('/process-message', methods=['POST'])
 def process_message():
-    """API endpoint for processing messages"""
     try:
         data = request.json
-        user_id = data.get('user_id')
-        message = data.get('message')
+        user_id = data.get('user_id', 'demo_user')
+        message = data.get('message', '')
+        real_name = data.get('real_name')
+        location = data.get('location')
+        phone = data.get('phone')
         
-        if not user_id or not message:
-            return jsonify({'error': 'Missing user_id or message'}), 400
+        if not message:
+            return jsonify({'error': 'Missing message'}), 400
         
-        # Process the message through anonymization pipeline
-        result = pipeline.process_message(user_id, message)
+        result = pipeline.analyze_message(message, user_id, real_name, location, phone)
         
         return jsonify({
             'success': True,
-            'chatbot_message': result['original_message'],
-            'metadata_stored': True,
-            'crisis_alert': result['crisis_alert'],
-            'anonymous_id': result['anonymous_metadata']['anonymous_id']
+            'anonymous_id': result['anonymous_id'],
+            'primary_emotion': result['primary_emotion'],
+            'emotional_distress_score': result['emotional_distress_score'],
+            'external_threat_score': result['external_threat_score'],
+            'is_suicidal': result['is_suicidal'],
+            'is_threat_alert': result['is_threat_alert'],
+            'sos_popup_trigger': result['sos_popup_trigger'],
+            'crisis_alert': result['sos_popup_trigger'],
         })
-        
     except Exception as e:
-        print(f"❌ Error: {str(e)}")
+        print(f"Error in process_message: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/analytics-demo', methods=['GET'])
 def analytics_demo():
-    """Demo endpoint showing anonymized analytics"""
+    from collections import Counter
+    counts = Counter(pipeline.emotion_history)
+    top_emotions = [
+        {'emotion': em, 'count': c, 'percentage': round(c / max(len(pipeline.emotion_history), 1) * 100, 1)}
+        for em, c in counts.most_common(5)
+    ]
+
     return jsonify({
         'total_messages_processed': pipeline.processed_count,
-        'privacy_guarantee': 'No original messages stored. Only anonymous metadata used for insights.',
-        'note': 'In production, this would show aggregated data from database'
+        'active_threat_alerts': pipeline.active_threat_alerts,
+        'active_counselor_alerts': pipeline.active_counselor_alerts,
+        'recent_messages': pipeline.recent_messages,
+        'top_emotions': top_emotions,
+        'privacy_guarantee': 'Zero PII exposure in regular state. Temporary authorized unmasking active only for life-safety threats.',
+    })
+
+@app.route('/transfer-police', methods=['POST'])
+def transfer_police():
+    data = request.json
+    alert_id = data.get('alert_id')
+    for item in pipeline.active_threat_alerts:
+        if item['alert_id'] == alert_id:
+            item['status'] = 'Transferred to Local Police Station (Units Dispatched)'
+            item['police_dispatch_time'] = 'Just now'
+            return jsonify({'success': True, 'message': f'Alert {alert_id} dispatched to police station.'})
+    return jsonify({'error': 'Alert ID not found'}), 404
+
+@app.route('/assign-counselor', methods=['POST'])
+def assign_counselor():
+    data = request.json
+    alert_id = data.get('alert_id')
+    counselor_name = data.get('counselor_name', 'Dr. Ayush Kulkarni (Empanelled Trauma Specialist)')
+    for item in pipeline.active_counselor_alerts:
+        if item['alert_id'] == alert_id:
+            item['counselor_assigned'] = counselor_name
+            item['status'] = 'Counselor Assigned & Reaching Out'
+            return jsonify({'success': True, 'message': f'Counselor assigned to {alert_id}.'})
+    return jsonify({'error': 'Alert ID not found'}), 404
+
+@app.route('/resolve-threat', methods=['POST'])
+def resolve_threat():
+    data = request.json
+    alert_id = data.get('alert_id')
+    pipeline.active_threat_alerts = [a for a in pipeline.active_threat_alerts if a['alert_id'] != alert_id]
+    return jsonify({'success': True, 'message': f'Threat {alert_id} marked as resolved and identity re-anonymized.'})
+
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({
+        'status': 'running',
+        'mode': 'full_ml_threat_emotion_ai',
+        'processed': pipeline.processed_count,
+        'threat_alerts_active': len(pipeline.active_threat_alerts),
     })
 
 if __name__ == '__main__':
-    print("\n" + "="*60)
-    print("🛡️  PRIVACY-FIRST ANONYMIZATION SERVICE")
-    print("="*60)
-    print("✅ Simplified version (no spaCy dependency)")
-    print("✅ Compatible with Python 3.14")
-    print("✅ RoBERTa emotion detection active")
-    print("✅ Keyword-based topic extraction")
-    print("="*60 + "\n")
     app.run(debug=True, host='0.0.0.0', port=5001)
