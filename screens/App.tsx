@@ -9,6 +9,10 @@ import Screen3 from './SwitchCategory';
 import Screen4 from './MentalHealthTests';
 import Screen5 from './ProfessionalCare';
 import Screen6 from './SuccessNetwork';
+import LoginScreen from './LoginScreen';
+import Dass21OnboardingScreen from './Dass21OnboardingScreen';
+import SignupScreen from './SignupScreen';
+import AdminDashboardScreen from './AdminDashboardScreen';
 
 const Stack = createNativeStackNavigator<any>();
 
@@ -17,13 +21,33 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator
         id="RootStack"
-        initialRouteName="Main"
+        initialRouteName="Login"
         screenOptions={{
           headerStyle: { backgroundColor: '#1C1C1E' },
           headerTintColor: '#FFFFFF',
           headerTitleStyle: { fontWeight: 'bold' },
         }}
       >
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen} 
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name="Signup" 
+          component={SignupScreen} 
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name="AdminDashboardScreen" 
+          component={AdminDashboardScreen} 
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name="Dass21OnboardingScreen" 
+          component={Dass21OnboardingScreen} 
+          options={{ headerShown: false }}
+        />
         <Stack.Screen 
           name="Main" 
           component={MainScreen} 

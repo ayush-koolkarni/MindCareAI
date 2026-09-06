@@ -27,7 +27,7 @@ export const generateGeminiResponse = async (
     }
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-1.5-flash",
       systemInstruction: SYSTEM_INSTRUCTION,
     });
 
@@ -45,7 +45,7 @@ export const generateGeminiResponse = async (
 
 const getLocalFallbackResponse = (prompt: string, category: string, language: string): string => {
   const lower = prompt.toLowerCase();
-  
+
   if (language === 'Hindi' || language === 'हिंदी') {
     if (lower.includes('threat') || lower.includes('डर') || lower.includes('धमकी') || lower.includes('खतरा')) {
       return "मैं आपकी चिंता पूरी तरह समझ सकता हूँ। आपकी सुरक्षा सबसे महत्वपूर्ण है। आप तत्काल पुलिस सुरक्षा पाने के कानूनी रूप से हकदार हैं। यदि कोई तात्कालिक खतरा है, तो कृपया तुरंत आपातकालीन नंबर 112 या हेल्पलाइन 14566 पर संपर्क करें। आप अकेले नहीं हैं। ❤️";

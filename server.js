@@ -91,6 +91,11 @@ const UserSchema = new mongoose.Schema(
       phone: { type: String, default: '' },
       relationship: { type: String, default: '' },
     },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+    },
   },
   {
     timestamps: true,
@@ -98,15 +103,10 @@ const UserSchema = new mongoose.Schema(
 );
 
 // Hash password before saving
-UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
+UserSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Compare password helper method
@@ -153,6 +153,33 @@ const ChatMessageSchema = new mongoose.Schema(
 );
 
 const ChatMessage = mongoose.model('ChatMessage', ChatMessageSchema);
+
+// DASS-21 Response Schema
+const Dass21ResponseSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      index: true,
+      lowercase: true,
+    },
+    responses: {
+      type: [Number], // Array of 21 integers (0-3)
+      required: true,
+      validate: [v => v.length === 21, 'DASS-21 requires exactly 21 responses']
+    },
+    scores: {
+      depression: { type: Number, required: true },
+      anxiety: { type: Number, required: true },
+      stress: { type: Number, required: true },
+    }
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const Dass21Response = mongoose.model('Dass21Response', Dass21ResponseSchema);
 
 // ==========================================
 // 4. AUTHENTICATION MIDDLEWARE
@@ -253,6 +280,7 @@ app.post('/api/auth/signup', async (req, res) => {
         name: newUser.name,
         email: newUser.email,
         preferredLanguage: newUser.preferredLanguage,
+        role: newUser.role,
         createdAt: newUser.createdAt,
       },
     });
@@ -261,6 +289,73 @@ app.post('/api/auth/signup', async (req, res) => {
     res.status(500).json({
       success: false,
       error: error.message || 'Server error during signup',
+    });
+  }
+});
+
+/**
+ * @route   POST /api/auth/admin-signup
+ * @desc    Register a new admin (Requires secret code)
+ */
+app.post('/api/auth/admin-signup', async (req, res) => {
+  try {
+    const { name, email, password, adminCode } = req.body;
+
+    if (!name || !email || !password || !adminCode) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please provide name, email, password, and adminCode',
+      });
+    }
+
+    // Hardcoded secret for hackathon purposes (in real world use env var)
+    if (adminCode !== 'ELEVANA_ADMIN_2026') {
+      return res.status(403).json({
+        success: false,
+        error: 'Invalid admin code',
+      });
+    }
+
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        error: 'An account with this email already exists',
+      });
+    }
+
+    const newAdmin = new User({
+      name,
+      email: email.toLowerCase(),
+      password,
+      role: 'admin',
+    });
+
+    await newAdmin.save();
+
+    const token = jwt.sign(
+      { id: newAdmin._id, email: newAdmin.email, name: newAdmin.name, role: newAdmin.role },
+      JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Admin registered successfully',
+      token,
+      user: {
+        id: newAdmin._id,
+        name: newAdmin.name,
+        email: newAdmin.email,
+        role: newAdmin.role,
+        createdAt: newAdmin.createdAt,
+      },
+    });
+  } catch (error) {
+    console.error('Error in /api/auth/admin-signup:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Server error during admin signup',
     });
   }
 });
@@ -296,6 +391,10 @@ app.post('/api/auth/login', async (req, res) => {
       });
     }
 
+    // Check if user has already completed DASS-21
+    const dassResponse = await Dass21Response.findOne({ email: user.email });
+    const hasCompletedDass = !!dassResponse;
+
     // Generate JWT Token
     const token = jwt.sign(
       { id: user._id, email: user.email, name: user.name },
@@ -307,11 +406,13 @@ app.post('/api/auth/login', async (req, res) => {
       success: true,
       message: 'Login successful',
       token,
+      hasCompletedDass,
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
         preferredLanguage: user.preferredLanguage,
+        role: user.role,
         createdAt: user.createdAt,
       },
     });
@@ -442,6 +543,46 @@ app.delete('/api/chats', authenticateToken, async (req, res) => {
     res.status(500).json({
       success: false,
       error: error.message || 'Failed to delete chat history',
+    });
+  }
+});
+
+// --- DASS-21 ASSESSMENT ROUTES ---
+
+/**
+ * @route   POST /api/dass21
+ * @desc    Save a DASS-21 assessment result for a user
+ */
+app.post('/api/dass21', authenticateToken, async (req, res) => {
+  try {
+    const { responses, scores } = req.body;
+    const email = req.user.email; // From JWT
+
+    if (!responses || responses.length !== 21 || !scores) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid assessment data format. Require 21 responses and scores.',
+      });
+    }
+
+    const assessment = new Dass21Response({
+      email,
+      responses,
+      scores,
+    });
+
+    await assessment.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Assessment saved successfully',
+      assessment,
+    });
+  } catch (error) {
+    console.error('Error saving DASS-21 response:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to save DASS-21 assessment',
     });
   }
 });
