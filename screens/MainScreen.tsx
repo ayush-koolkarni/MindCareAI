@@ -174,6 +174,8 @@ const MainScreen: React.FC = () => {
             setCurrentCategory(category);
           }
         });
+      } else if (screenName === 'Logout') {
+        (navigation as any).replace('Login');
       } else {
         (navigation as any).navigate(screenName);
       }

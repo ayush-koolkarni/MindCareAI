@@ -65,6 +65,7 @@ const SlidingPanel: React.FC<SlidingPanelProps> = ({
     { target: 'MentalHealthTests', label: 'Mental Health Assessment', icon: '📊', description: 'DASS-21, PHQ-9 & clinical scales' },
     { target: 'ProfessionalCare', label: 'Professional Support', icon: '🏥', description: 'Police FIR & counselor booking' },
     { target: 'SuccessNetwork', label: 'Success Network', icon: '⭐', description: 'Justice milestones & survivor journeys' },
+    { target: 'Logout', label: 'Log out', icon: '🚪', description: 'Securely sign out of your account' },
   ];
 
   return (
