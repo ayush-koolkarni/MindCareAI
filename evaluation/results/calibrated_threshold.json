@@ -1,0 +1,5 @@
+{
+  "model": "training/output/roberta-go-emotions/final",
+  "threshold": 0.25000000000000006,
+  "validation_macro_f1": 0.5142797039061016
+}

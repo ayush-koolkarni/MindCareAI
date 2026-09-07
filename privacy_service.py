@@ -6,24 +6,15 @@ import re
 from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from nlp.inference import NLPInference
 
 app = Flask(__name__)
 CORS(app)
 
 print("🚀 Starting Elevana AI Full ML & Threat Service (Port 5001)")
 
-# Try loading HuggingFace model if available, otherwise fallback
-try:
-    from transformers import AutoTokenizer, AutoModelForSequenceClassification
-    import torch
-    print("Loading RoBERTa emotion model...")
-    tokenizer = AutoTokenizer.from_pretrained("SamLowe/roberta-base-go_emotions")
-    emotion_model = AutoModelForSequenceClassification.from_pretrained("SamLowe/roberta-base-go_emotions")
-    has_transformers = True
-    print("✅ Model loaded successfully!")
-except Exception as e:
-    print("⚠️ Transformers not loaded, using robust rule-based model:", e)
-    has_transformers = False
+print("Loading refined spaCy + RoBERTa NLP pipeline...")
+nlp_pipeline = NLPInference()
 
 EMOTION_KEYWORDS = {
     'joy': ['happy', 'excited', 'great', 'wonderful', 'amazing', 'love', 'glad', 'delighted', 'relieved', 'safe'],
@@ -94,17 +85,16 @@ class FullThreatIntelligencePipeline:
     
     def analyze_message(self, text: str, user_id: str, real_name: str = None, location: str = None, phone: str = None) -> dict:
         text_lower = text.lower()
-        
-        # 1. Emotion detection
-        emotion_scores = {}
-        for emotion, keywords in EMOTION_KEYWORDS.items():
-            score = sum(1 for kw in keywords if kw in text_lower)
-            if score > 0:
-                emotion_scores[emotion] = score
-        
-        sorted_emotions = sorted(emotion_scores.items(), key=lambda x: x[1], reverse=True)
-        primary_emotion = sorted_emotions[0][0] if sorted_emotions else 'neutral'
-        
+
+            # 1. Refined emotion detection using spaCy + fine-tuned RoBERTa
+        nlp_result = nlp_pipeline.analyze(text)
+        emotions = nlp_result["emotions"]
+
+        if emotions:
+            primary_emotion = emotions[0]["emotion"]
+        else:
+            primary_emotion = "neutral"
+
         # 2. Emotional Distress Score (0-100)
         distress_score = 25
         detected_suicide = []
@@ -194,6 +184,7 @@ class FullThreatIntelligencePipeline:
         return {
             'anonymous_id': anon_id,
             'primary_emotion': primary_emotion,
+            'emotions': emotions,
             'emotional_distress_score': distress_score,
             'external_threat_score': threat_score,
             'is_suicidal': is_suicidal,
@@ -223,6 +214,7 @@ def process_message():
             'success': True,
             'anonymous_id': result['anonymous_id'],
             'primary_emotion': result['primary_emotion'],
+            'emotions': result['emotions'],
             'emotional_distress_score': result['emotional_distress_score'],
             'external_threat_score': result['external_threat_score'],
             'is_suicidal': result['is_suicidal'],

@@ -1,0 +1,49 @@
+MindCareAI - Fine-Tuned RoBERTa Benchmark
+============================================================
+
+Model: training\output\roberta-go-emotions\final
+Benchmark samples: 741
+Device: cpu
+
+Metrics
+Accuracy: 0.5533
+Macro Precision: 0.5872
+Macro Recall: 0.5039
+Macro F1: 0.5176
+Weighted F1: 0.5616
+
+Classification Report
+                precision    recall  f1-score   support
+
+    admiration     0.5111    0.7667    0.6133        30
+     amusement     0.7647    0.8667    0.8125        30
+         anger     0.5556    0.5000    0.5263        30
+     annoyance     0.2000    0.1667    0.1818        30
+      approval     0.3333    0.3667    0.3492        30
+        caring     0.5652    0.4333    0.4906        30
+     confusion     0.4800    0.4000    0.4364        30
+     curiosity     0.5161    0.5333    0.5246        30
+        desire     0.8182    0.6000    0.6923        30
+disappointment     0.5263    0.3333    0.4082        30
+   disapproval     0.4062    0.4333    0.4194        30
+       disgust     0.7600    0.6333    0.6909        30
+ embarrassment     0.9286    0.5652    0.7027        23
+    excitement     0.7500    0.5000    0.6000        30
+          fear     0.7333    0.7333    0.7333        30
+     gratitude     0.9355    0.9667    0.9508        30
+         grief     0.0000    0.0000    0.0000         2
+           joy     0.7778    0.7000    0.7368        30
+          love     0.8710    0.9000    0.8852        30
+   nervousness     0.6667    0.3333    0.4444        12
+      optimism     0.5556    0.6667    0.6061        30
+         pride     1.0000    0.1429    0.2500         7
+   realization     0.5714    0.1333    0.2162        30
+        relief     0.0000    0.0000    0.0000         7
+       remorse     0.7931    0.7667    0.7797        30
+       sadness     0.5667    0.5667    0.5667        30
+      surprise     0.7308    0.6333    0.6786        30
+       neutral     0.1250    0.4667    0.1972        30
+
+      accuracy                         0.5533       741
+     macro avg     0.5872    0.5039    0.5176       741
+  weighted avg     0.6097    0.5533    0.5616       741

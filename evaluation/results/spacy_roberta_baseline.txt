@@ -1,0 +1,49 @@
+SPACY + ROBERTA FIXED BENCHMARK RESULTS
+======================================================================
+
+Benchmark examples : 741
+Accuracy           : 0.5317
+Macro Precision    : 0.5904
+Macro Recall       : 0.4898
+Macro F1           : 0.5109
+Weighted F1        : 0.5504
+
+Examples with negation : 162
+Total negation tokens  : 184
+
+Classification Report
+----------------------------------------------------------------------
+                precision    recall  f1-score   support
+
+    admiration     0.5349    0.7667    0.6301        30
+     amusement     0.7647    0.8667    0.8125        30
+         anger     0.5909    0.4333    0.5000        30
+     annoyance     0.2400    0.2000    0.2182        30
+      approval     0.3667    0.3667    0.3667        30
+        caring     0.4583    0.3667    0.4074        30
+     confusion     0.4815    0.4333    0.4561        30
+     curiosity     0.5172    0.5000    0.5085        30
+        desire     0.8571    0.6000    0.7059        30
+disappointment     0.5556    0.3333    0.4167        30
+   disapproval     0.4800    0.4000    0.4364        30
+       disgust     0.7917    0.6333    0.7037        30
+ embarrassment     0.9231    0.5217    0.6667        23
+    excitement     0.7500    0.5000    0.6000        30
+          fear     0.8400    0.7000    0.7636        30
+     gratitude     0.9355    0.9667    0.9508        30
+         grief     0.0000    0.0000    0.0000         2
+           joy     0.6562    0.7000    0.6774        30
+          love     0.8710    0.9000    0.8852        30
+   nervousness     0.6364    0.5833    0.6087        12
+       neutral     0.0952    0.4667    0.1582        30
+      optimism     0.5789    0.3667    0.4490        30
+         pride     1.0000    0.1429    0.2500         7
+   realization     0.5714    0.1333    0.2162        30
+        relief     0.0000    0.0000    0.0000         7
+       remorse     0.7586    0.7333    0.7458        30
+       sadness     0.5484    0.5667    0.5574        30
+      surprise     0.7273    0.5333    0.6154        30
+
+      accuracy                         0.5317       741
+     macro avg     0.5904    0.4898    0.5109       741
+  weighted avg     0.6140    0.5317    0.5504       741

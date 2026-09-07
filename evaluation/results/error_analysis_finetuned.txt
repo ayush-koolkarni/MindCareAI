@@ -1,0 +1,220 @@
+MindCareAI - Fine-Tuned RoBERTa Error Analysis
+======================================================================
+
+Total examples : 741
+Correct        : 410
+Incorrect      : 331
+
+Most common confusion pairs
+----------------------------------------------------------------------
+disapproval        → neutral            12
+confusion          → neutral            8
+curiosity          → neutral            8
+realization        → neutral            8
+approval           → neutral            7
+caring             → neutral            7
+anger              → annoyance          6
+annoyance          → anger              6
+annoyance          → neutral            6
+confusion          → curiosity          6
+disappointment     → neutral            5
+excitement         → neutral            5
+optimism           → neutral            5
+realization        → approval           5
+caring             → approval           4
+curiosity          → confusion          4
+desire             → neutral            4
+admiration         → neutral            3
+admiration         → optimism           3
+amusement          → admiration         3
+annoyance          → disapproval        3
+approval           → disapproval        3
+caring             → optimism           3
+disappointment     → disapproval        3
+disappointment     → annoyance          3
+
+
+Classes with most errors
+----------------------------------------------------------------------
+realization          26
+annoyance            25
+disappointment       20
+approval             19
+confusion            18
+caring               17
+disapproval          17
+neutral              16
+anger                15
+excitement           15
+curiosity            14
+sadness              13
+desire               12
+disgust              11
+surprise             11
+embarrassment        10
+optimism             10
+joy                  9
+fear                 8
+nervousness          8
+admiration           7
+relief               7
+remorse              7
+pride                6
+amusement            4
+love                 3
+grief                2
+gratitude            1
+
+
+Sample errors
+======================================================================
+
+1. Text:
+   This is the most high school post I’ve ever seen on this subreddit.
+   True      : admiration
+   Predicted : neutral
+
+2. Text:
+   Sorry I forgot you guys beat Pitt. Congrats on your 2 win season.
+   True      : admiration
+   Predicted : remorse
+
+3. Text:
+   I think the real reason is good press and booze
+   True      : admiration
+   Predicted : neutral
+
+4. Text:
+   You will have symptoms for a few more weeks while it kicks in, good luck, glad to see youre doing better
+   True      : admiration
+   Predicted : optimism
+
+5. Text:
+   She better!!! .....nobody else will
+   True      : admiration
+   Predicted : optimism
+
+6. Text:
+   "You should be so lucky." Bonus points if they get confused. 
+   True      : admiration
+   Predicted : neutral
+
+7. Text:
+   Having a good list of alternatives would be something great we could produce
+   True      : admiration
+   Predicted : optimism
+
+8. Text:
+   shits awesome!
+   True      : amusement
+   Predicted : admiration
+
+9. Text:
+   Looking cool [NAME]
+   True      : amusement
+   Predicted : admiration
+
+10. Text:
+   I’m not sure are we now taking the word of the FBI and Navy as legitimate sources or what’s happening here lol?
+   True      : amusement
+   Predicted : confusion
+
+11. Text:
+   Your username makes me think you would appreciate this joke of mine.
+   True      : amusement
+   Predicted : admiration
+
+12. Text:
+   they dont pay shit
+   True      : anger
+   Predicted : annoyance
+
+13. Text:
+   Maybe [NAME].
+   True      : anger
+   Predicted : neutral
+
+14. Text:
+   Somebody gettin fired
+   True      : anger
+   Predicted : neutral
+
+15. Text:
+   Not sure, I'm not good at expressing my feelings, and sometimes I get angry and say things that very hurtful
+   True      : anger
+   Predicted : sadness
+
+16. Text:
+   Holy shit bro
+   True      : anger
+   Predicted : surprise
+
+17. Text:
+   I had a friend send me a 3+ hour paranoid conspiracy documentary, zeitgeist I think it was called... Wasted 10 minutes before I noped the fuck out..
+   True      : anger
+   Predicted : annoyance
+
+18. Text:
+   Yeah, he does. Just because he draws different conclusions than you doesn't mean he isn't reading [NAME]. Get out of your little bubble.
+   True      : anger
+   Predicted : annoyance
+
+19. Text:
+   That's the problem I'm pointing, the media use stupid clicbait names and people get dumber and dumber.
+   True      : anger
+   Predicted : annoyance
+
+20. Text:
+   Except forming an opinion of a topic without even having basic knowledge of said topic makes you sound pretty arrogant and entirely undercuts your opinion.
+   True      : anger
+   Predicted : disapproval
+
+21. Text:
+   I do remember this and wanted nothing more than to kill that guy
+   True      : anger
+   Predicted : desire
+
+22. Text:
+   One dumbass who hasn’t watched Hereditary complaining about meaningless awards on the Internet means... eh. I lost my point. Go watch Hereditary
+   True      : anger
+   Predicted : annoyance
+
+23. Text:
+   holy shit that's bad, maybe the extremist right can't meme either?
+   True      : anger
+   Predicted : disapproval
+
+24. Text:
+   Omg enough of all the damn hashtags, it’s not 2016 anymore
+   True      : anger
+   Predicted : annoyance
+
+25. Text:
+   So this is how democracy dies... With thunderous upvotes.
+   True      : anger
+   Predicted : disappointment
+
+26. Text:
+   Wtf? Really?
+   True      : anger
+   Predicted : curiosity
+
+27. Text:
+   I would hope that Cartoon Network would have nothing to do with it. Would hate to see them "Teen Titan" ASOIAF. 
+   True      : annoyance
+   Predicted : optimism
+
+28. Text:
+   You’re a liar. 😂
+   True      : annoyance
+   Predicted : anger
+
+29. Text:
+   [NAME] is known to make a short video hella fucking long. Not many want to see even more people do that. I'll stick to [NAME].
+   True      : annoyance
+   Predicted : neutral
+
+30. Text:
+   [NAME] damn hippies
+   True      : annoyance
+   Predicted : anger

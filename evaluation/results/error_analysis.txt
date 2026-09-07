@@ -1,0 +1,432 @@
+MindCareAI - RoBERTa Error Analysis
+============================================================
+
+Benchmark samples: 741
+Errors: 347
+
+Most common confusion pairs
+------------------------------------------------------------
+disapproval -> neutral: 14
+realization -> neutral: 11
+caring -> neutral: 10
+disappointment -> neutral: 10
+annoyance -> neutral: 9
+approval -> neutral: 9
+anger -> annoyance: 7
+confusion -> neutral: 7
+curiosity -> neutral: 7
+excitement -> neutral: 7
+surprise -> neutral: 7
+confusion -> curiosity: 6
+desire -> neutral: 6
+admiration -> neutral: 5
+anger -> neutral: 5
+annoyance -> anger: 5
+curiosity -> confusion: 5
+disgust -> neutral: 5
+optimism -> neutral: 5
+optimism -> caring: 5
+
+
+Sample errors
+------------------------------------------------------------
+
+1. This is the most high school post I’ve ever seen on this subreddit.
+True: admiration
+Predicted: neutral
+
+2. Sorry I forgot you guys beat Pitt. Congrats on your 2 win season.
+True: admiration
+Predicted: remorse
+
+3. [NAME] deserves better
+True: admiration
+Predicted: neutral
+
+4. I think the real reason is good press and booze
+True: admiration
+Predicted: neutral
+
+5. You will have symptoms for a few more weeks while it kicks in, good luck, glad to see youre doing better
+True: admiration
+Predicted: caring
+
+6. She better!!! .....nobody else will
+True: admiration
+Predicted: neutral
+
+7. "You should be so lucky." Bonus points if they get confused. 
+True: admiration
+Predicted: neutral
+
+8. shits awesome!
+True: amusement
+Predicted: admiration
+
+9. Looking cool [NAME]
+True: amusement
+Predicted: admiration
+
+10. I’m not sure are we now taking the word of the FBI and Navy as legitimate sources or what’s happening here lol?
+True: amusement
+Predicted: confusion
+
+11. Your username makes me think you would appreciate this joke of mine.
+True: amusement
+Predicted: admiration
+
+12. they dont pay shit
+True: anger
+Predicted: annoyance
+
+13. Maybe [NAME].
+True: anger
+Predicted: neutral
+
+14. Somebody gettin fired
+True: anger
+Predicted: neutral
+
+15. Not sure, I'm not good at expressing my feelings, and sometimes I get angry and say things that very hurtful
+True: anger
+Predicted: sadness
+
+16. [NAME] FIRED.
+True: anger
+Predicted: neutral
+
+17. Holy shit bro
+True: anger
+Predicted: surprise
+
+18. I had a friend send me a 3+ hour paranoid conspiracy documentary, zeitgeist I think it was called... Wasted 10 minutes before I noped the fuck out..
+True: anger
+Predicted: neutral
+
+19. Yeah, he does. Just because he draws different conclusions than you doesn't mean he isn't reading [NAME]. Get out of your little bubble.
+True: anger
+Predicted: neutral
+
+20. That's the problem I'm pointing, the media use stupid clicbait names and people get dumber and dumber.
+True: anger
+Predicted: annoyance
+
+21. Except forming an opinion of a topic without even having basic knowledge of said topic makes you sound pretty arrogant and entirely undercuts your opinion.
+True: anger
+Predicted: annoyance
+
+22. I do remember this and wanted nothing more than to kill that guy
+True: anger
+Predicted: desire
+
+23. Fuck so obvious
+True: anger
+Predicted: annoyance
+
+24. One dumbass who hasn’t watched Hereditary complaining about meaningless awards on the Internet means... eh. I lost my point. Go watch Hereditary
+True: anger
+Predicted: annoyance
+
+25. holy shit that's bad, maybe the extremist right can't meme either?
+True: anger
+Predicted: annoyance
+
+26. Omg enough of all the damn hashtags, it’s not 2016 anymore
+True: anger
+Predicted: annoyance
+
+27. So this is how democracy dies... With thunderous upvotes.
+True: anger
+Predicted: disappointment
+
+28. Wtf? Really?
+True: anger
+Predicted: curiosity
+
+29. I would hope that Cartoon Network would have nothing to do with it. Would hate to see them "Teen Titan" ASOIAF. 
+True: annoyance
+Predicted: optimism
+
+30. You’re a liar. 😂
+True: annoyance
+Predicted: anger
+
+31. [NAME] is known to make a short video hella fucking long. Not many want to see even more people do that. I'll stick to [NAME].
+True: annoyance
+Predicted: neutral
+
+32. [NAME] damn hippies
+True: annoyance
+Predicted: anger
+
+33. It's so weird having HGs up this early, but I love having something to watch before my 8am lecture starts.
+True: annoyance
+Predicted: love
+
+34. So. Fucking. Tone. Deaf.
+True: annoyance
+Predicted: anger
+
+35. And it’s always so uncomfortably awkward when someone says shit like this to you.
+True: annoyance
+Predicted: embarrassment
+
+36. Maybe try living a little longer before you talk about things you don't know about, sweaty. NEXT!
+True: annoyance
+Predicted: neutral
+
+37. I made one comment, and you came in to call it childish..... like, what else are you doing besides badgering?
+True: annoyance
+Predicted: neutral
+
+38. Y’all are just jealous that this individual identifies as a fish hook. On a serious note though going through an airport tsa must be a nightmare
+True: annoyance
+Predicted: neutral
+
+39. Oh. Damn.
+True: annoyance
+Predicted: anger
+
+40. Did anyone else read this and say "Fuck yeah!"?
+True: annoyance
+Predicted: curiosity
+
+41. Don't chase after out of position teammates. Your life as a Mercy is more important. Let them fools die and learn their lesson.
+True: annoyance
+Predicted: caring
+
+42. I know they are treated very well, but some of them do die.
+True: annoyance
+Predicted: sadness
+
+43. Don't make me kiss you!
+True: annoyance
+Predicted: neutral
+
+44. Your kind honestly need to fuck off out of Ireland. Nobody wants your dumb fucking antisemitism here
+True: annoyance
+Predicted: anger
+
+45. too damn often!! and i’m cute as hell! i’m mad!!
+True: annoyance
+Predicted: admiration
+
+46. I am still missing money from a August 2018 withdrawal with no update and no success. Quadriga - give me back my money!
+True: annoyance
+Predicted: neutral
+
+47. How offensive. I, am NOT a duck!
+True: annoyance
+Predicted: disgust
+
+48. Of course these are all conspiracy theory shitposts BUT just because he got squeezed out, doesn’t mean they want him playing for a rival team.
+True: annoyance
+Predicted: neutral
+
+49. Just saw your history. Makes complete sense now. Your a trumptroll. Bye.
+True: annoyance
+Predicted: neutral
+
+50. I didn't say it was proof that anything was a scam with no future, perhaps you're projecting.
+True: annoyance
+Predicted: neutral
+
+51. Nope. Don't need rewards at all.
+True: annoyance
+Predicted: disapproval
+
+52. [NAME] is Television. Got it. He's too misogynistic to be the Patti Smith Group.
+True: annoyance
+Predicted: approval
+
+53. He was a US Attorney and Mayor of NYC. He's not an idiot and knows exactly what he's doing.
+True: approval
+Predicted: neutral
+
+54. We also one because [NAME] straight took that game over late.
+True: approval
+Predicted: neutral
+
+55. It did! Good luck on yours!! -[NAME]
+True: approval
+Predicted: caring
+
+56. Studying something doesn't make you bright. Getting a degree does.
+True: approval
+Predicted: disapproval
+
+57. By all means, go for it. We'll all be much happier when you're not dragging us down anymore.
+True: approval
+Predicted: joy
+
+58. Yes owe I believe 13,000$ something on it currently.
+True: approval
+Predicted: neutral
+
+59. He already has a baby with his girlfriend who’s gorgeous
+True: approval
+Predicted: admiration
+
+60. Yea I would've lost it there
+True: approval
+Predicted: neutral
+
+61. I do not disagree with any of this. Good take, sir.
+True: approval
+Predicted: disapproval
+
+62. Yeah, and in Brazil we write only in cursive so I don't get those people.
+True: approval
+Predicted: disapproval
+
+63. Pretty much every Punjabi dude I've met.
+True: approval
+Predicted: neutral
+
+64. I think you should nourish it with activated almonds.
+True: approval
+Predicted: neutral
+
+65. Terrorism is the systematic use of violence to achieve a political goal. [NAME] has not used violence.
+True: approval
+Predicted: neutral
+
+66. You know a giant lady as a character would be very interesting in my opinion.
+True: approval
+Predicted: admiration
+
+67. Itll happen. Im 36 and i think i finally found the one last year 🤞
+True: approval
+Predicted: optimism
+
+68. [NAME] for reasons of his ACL. Although, assuming everyone on the list was fit to play, I'll say [NAME].
+True: approval
+Predicted: neutral
+
+69. I'm replying just bask in the glow with someone else! Yay!!
+True: approval
+Predicted: excitement
+
+70. For me it's New York City FC since it's just a train ride away
+True: approval
+Predicted: neutral
+
+71. In my opinion, there should have never been a canon character... Maybe keeping it a mystery would be the BEST!
+True: approval
+Predicted: confusion
+
+72. I usually say , DON'T BE EMBARRASSED ! They don't know you anyway...mm
+True: caring
+Predicted: neutral
+
+73. All the ladies can stay at my place.
+True: caring
+Predicted: neutral
+
+74. I’m starting to worry that [NAME] is not okay
+True: caring
+Predicted: nervousness
+
+75. They do sound kinda not worth it then. At least large ones don't sound worth it. You have my sympathy.
+True: caring
+Predicted: disapproval
+
+76. Adapt and overcome
+True: caring
+Predicted: neutral
+
+77. Like you said your tired probably mentally and physically. You need a dam break is what it sounds like my friend.
+True: caring
+Predicted: neutral
+
+78. Unemployed now re: those crummy health issues. So that probably helped.
+True: caring
+Predicted: approval
+
+79. No problem at all! If you ever want to talk to some internet random again, feel free to talk to me.
+True: caring
+Predicted: approval
+
+80. please dont bring a woman in as a sex toy for you both. hire a sex worker instead
+True: caring
+Predicted: neutral
+
+81. Break ups are hard. Hope you feel better.
+True: caring
+Predicted: optimism
+
+82. [NAME] had them a few months ago. Friend bought some for her sick dog.
+True: caring
+Predicted: neutral
+
+83. Not sinking in is it. I'm hardly speaking in riddles. Good luck
+True: caring
+Predicted: optimism
+
+84. Well everyone is entitled to their opinion but I think you need to be a bit more mature about everyone having different bodies
+True: caring
+Predicted: approval
+
+85. Get it out of the way as quickly as possible. Some people claim to like it, so maybe you'll be one of those weirdos.
+True: caring
+Predicted: neutral
+
+86. I'm so glad you have access to that trans group. You will make friends and be able to support each other.
+True: caring
+Predicted: joy
+
+87. Fixed That For You
+True: caring
+Predicted: neutral
+
+88. Follow rules 1 and 2 and you can have lame openers and you'll be fine.
+True: caring
+Predicted: neutral
+
+89. Congrats and be well. Peace and tranquility to you. !
+True: caring
+Predicted: gratitude
+
+90. Op you're fine, anyone who's actually been in your situation would have reacted the same. This commentor is just trying to make you feel bad. 
+True: caring
+Predicted: neutral
+
+91. Um... I’m extremely concerned as to which one’s business and which one’s casual.
+True: confusion
+Predicted: caring
+
+92. Why the assumption that Kitchens will turn out better than JBC did? The scenarios seem very similar
+True: confusion
+Predicted: curiosity
+
+93. Ok, fair enough. From your original post, it wasn't really clear that you looked at sources other than YouTube.
+True: confusion
+Predicted: approval
+
+94. Normally drop n roll. In this case I would remove my clothes because I doubt rolling would help.
+True: confusion
+Predicted: neutral
+
+95. I'm not seeing eye patch guy
+True: confusion
+Predicted: neutral
+
+96. Excitement for new regulation and taxation in the ancap reddit?!?
+True: confusion
+Predicted: excitement
+
+97. are your feelings hurt?
+True: confusion
+Predicted: curiosity
+
+98. Go look at the top posts of those subs. How far do you have to scroll to get to a "men are trash" post?
+True: confusion
+Predicted: neutral
+
+99. I'm struggling to find what you're referring to here, could you maybe add something that points to it?
+True: confusion
+Predicted: curiosity
+
+100. How can we send money to you?
+True: confusion
+Predicted: curiosity

@@ -62,3 +62,16 @@ android/app/build/
 android/app/.cxx/
 android/.cxx/
 *.jsbundle
+
+# Python virtual environment
+.venv/
+
+# Machine learning model outputs
+training/output/
+
+# Generated evaluation data
+evaluation/data/
+
+# Python / ML cache files
+*.pyc
+__pycache__/
